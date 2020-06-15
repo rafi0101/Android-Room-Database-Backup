@@ -1,6 +1,7 @@
 package com.ebner.roomdatabasebackup.core
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.room.RoomDatabase
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -8,33 +9,88 @@ import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.Comparator
 
 
 /**
  * Created by raphael on 11.06.2020.
  * Android Room Database Backup Created in com.ebner.roomdatabasebackup.core
  */
-class RoomBackup(
-    private var context: Context,
-    private var dbName: String
+class RoomBackup {
 
-) {
-    lateinit var roomDatabase: RoomDatabase
-    lateinit var secretKey: String
 
-    private val BACKUP_PATH = "${context.filesDir}/databasebackup/"
-    private val DATABASE_PATH = Paths.get(context.getDatabasePath(dbName).toURI())
+    private val TAG = "debug_RoomBackup"
 
-    /*---------------------Create Backup of current database with timestamp--------------------------*/
+    private var context: Context? = null
+    private var roomDatabase: RoomDatabase? = null
+    private var secretKey: String? = null
+    private var enableToastDebug: Boolean = false
+    private var enableLogDebug: Boolean = false
+    private var onCompleteListener: OnCompleteListener? = null
+
+    fun context(context: Context): RoomBackup {
+        this.context = context
+        return this
+    }
+
+    fun database(roomDatabase: RoomDatabase): RoomBackup {
+        this.roomDatabase = roomDatabase
+        return this
+    }
+
+    fun secretKey(secretKey: String): RoomBackup {
+        this.secretKey = secretKey
+        return this
+    }
+
+    fun enableToastDebug(enableToastDebug: Boolean): RoomBackup {
+        this.enableToastDebug = enableToastDebug
+        return this
+    }
+
+    fun enableLogDebug(enableLogDebug: Boolean): RoomBackup {
+        this.enableLogDebug = enableLogDebug
+        return this
+    }
+
+    fun onCompleteListener(onCompleteListener: OnCompleteListener): RoomBackup {
+        this.onCompleteListener = onCompleteListener
+        return this
+    }
+
+    private lateinit var dbName: String
+    private lateinit var BACKUP_PATH: String
+    private lateinit var DATABASE_PATH: Path
+
+    private fun initRoomBackup(): Boolean {
+        if (context == null) {
+            onCompleteListener?.onComplete(false, "context is missing")
+            return false
+        }
+        if (roomDatabase == null) {
+            onCompleteListener?.onComplete(false, "roomDatabase is missing")
+            return false
+        }
+
+        dbName = roomDatabase!!.openHelper.databaseName
+        BACKUP_PATH = "${context!!.filesDir}/databasebackup/"
+        DATABASE_PATH = Paths.get(context!!.getDatabasePath(dbName).toURI())
+        return true
+    }
+
+
     fun backup() {
+        val success = initRoomBackup()
+        if (!success) return
 
         //Close the database
-        roomDatabase.close()
+        roomDatabase!!.close()
 
         //Create backup directory if does not exist
         try {
@@ -49,14 +105,34 @@ class RoomBackup(
         //Path to save current database
         val backuppath = Paths.get("$BACKUP_PATH$filename")
 
+
         //Copy current database to save location (/files dir)
         Files.copy(DATABASE_PATH, backuppath, StandardCopyOption.REPLACE_EXISTING)
 
+
+        onCompleteListener?.onComplete(true, "success")
+
+        if (enableToastDebug) Toast.makeText(context, "Saved to: $backuppath", Toast.LENGTH_LONG).show()
+        if (enableLogDebug) Log.d(TAG, "Saved to: $backuppath")
     }
 
-    /*---------------------Public method, to show dialog with all files to restore--------------------------*/
+
+    /*---------------------Get current Date / Time --------------------------*/
+    private fun getTime(): String {
+
+        val currentTime = LocalDateTime.now()
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")
+
+        return currentTime.format(formatter)
+
+    }
+
+
     fun restore() {
 
+        val success = initRoomBackup()
+        if (!success) return
 
         val backupDirectory = File(BACKUP_PATH)
         //All Files in an Array of type File
@@ -64,7 +140,7 @@ class RoomBackup(
 
         //If array is null or empty show "error" and return
         if (arrayOfFiles.isNullOrEmpty()) {
-            Toast.makeText(context, "Bisher gibt es noch keine Backups", Toast.LENGTH_LONG).show()
+            onCompleteListener?.onComplete(false, "No Backups available")
             return
         }
 
@@ -91,30 +167,27 @@ class RoomBackup(
                 restoreSelectedFile(filesStringArray[which])
             }
             .show()
-
-    }
-
-    /*---------------------Get current Date / Time --------------------------*/
-    private fun getTime(): String {
-
-        val currentTime = LocalDateTime.now()
-
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")
-
-        return currentTime.format(formatter)
-
     }
 
     /*---------------------restore selected file--------------------------*/
     private fun restoreSelectedFile(filename: String) {
         //Close the database
-        roomDatabase.close()
+        roomDatabase!!.close()
+
 
         //Backup location
         val backuppath = Paths.get("$BACKUP_PATH$filename")
 
         //Copy back database and replace current database
         Files.copy(backuppath, DATABASE_PATH, StandardCopyOption.REPLACE_EXISTING)
+
+
+        if (enableToastDebug) Toast.makeText(context, "Restored File: $backuppath", Toast.LENGTH_LONG).show()
+        if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
+
+
+        onCompleteListener?.onComplete(true, "success")
+
 
     }
 
