@@ -1,6 +1,7 @@
 package com.ebner.roomdatabasebackup.core
 
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.room.RoomDatabase
@@ -32,6 +33,8 @@ class RoomBackup {
     private var secretKey: String? = null
     private var enableToastDebug: Boolean = false
     private var enableLogDebug: Boolean = false
+    private var restartOnComplete: Boolean = true
+    private var restartIntent: Intent? = null
     private var onCompleteListener: OnCompleteListener? = null
 
     fun context(context: Context): RoomBackup {
@@ -59,6 +62,12 @@ class RoomBackup {
         return this
     }
 
+    fun restartOnComplete(restartOnComplete: Boolean, restartIntent: Intent): RoomBackup {
+        this.restartOnComplete = restartOnComplete
+        this.restartIntent = restartIntent
+        return this
+    }
+
     fun onCompleteListener(onCompleteListener: OnCompleteListener): RoomBackup {
         this.onCompleteListener = onCompleteListener
         return this
@@ -77,6 +86,10 @@ class RoomBackup {
             onCompleteListener?.onComplete(false, "roomDatabase is missing")
             return false
         }
+        if (restartOnComplete && restartIntent == null) {
+            onCompleteListener?.onComplete(false, "intent to restart is missing")
+            return false
+        }
 
         dbName = roomDatabase!!.openHelper.databaseName
         BACKUP_PATH = "${context!!.filesDir}/databasebackup/"
@@ -84,6 +97,13 @@ class RoomBackup {
         return true
     }
 
+    private fun restartApp() {
+        restartIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context!!.startActivity(restartIntent)
+        //   finish()
+        Runtime.getRuntime().exit(0)
+
+    }
 
     fun backup() {
         val success = initRoomBackup()
@@ -109,11 +129,13 @@ class RoomBackup {
         //Copy current database to save location (/files dir)
         Files.copy(DATABASE_PATH, backuppath, StandardCopyOption.REPLACE_EXISTING)
 
-
-        onCompleteListener?.onComplete(true, "success")
-
         if (enableToastDebug) Toast.makeText(context, "Saved to: $backuppath", Toast.LENGTH_LONG).show()
         if (enableLogDebug) Log.d(TAG, "Saved to: $backuppath")
+
+
+        onCompleteListener?.onComplete(true, "success")
+        if (restartOnComplete) restartApp()
+
     }
 
 
@@ -187,7 +209,7 @@ class RoomBackup {
 
 
         onCompleteListener?.onComplete(true, "success")
-
+        if (restartOnComplete) restartApp()
 
     }
 

@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(true)
                 .enableToastDebug(true)
+                .restartOnComplete(true, Intent(this, MainActivity::class.java))
                 .onCompleteListener(object : OnCompleteListener {
                     override fun onComplete(success: Boolean, message: String) {
                         Toast.makeText(this@MainActivity, "backup: $message", Toast.LENGTH_SHORT).show()
@@ -83,7 +84,6 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .backup()
 
 
-
         }
         btn_restore.setOnClickListener {
             RoomBackup()
@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(true)
                 .enableToastDebug(true)
+                .restartOnComplete(true, Intent(this, MainActivity::class.java))
                 .onCompleteListener(object : OnCompleteListener {
                     override fun onComplete(success: Boolean, message: String) {
                         Toast.makeText(this@MainActivity, "restore: $message", Toast.LENGTH_SHORT).show()
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 val fruit = adapter.getFruitAt(position)!!
 
                 fruitViewModel.delete(fruit)
-              //  adapter.notifyItemChanged(position)
+                //  adapter.notifyItemChanged(position)
                 // show snack bar with Undo option
                 val snackbar = Snackbar
                     .make(clMain, "${fruit.name} deleted", 8000)
