@@ -26,14 +26,18 @@ import kotlin.Comparator
 class RoomBackup {
 
 
-    private val TAG = "debug_RoomBackup"
+    private var TAG = "debug_RoomBackup"
+    private lateinit var dbName: String
+    private lateinit var BACKUP_PATH: String
+    private lateinit var DATABASE_PATH: Path
 
     private var context: Context? = null
     private var roomDatabase: RoomDatabase? = null
-    private var enableToastDebug: Boolean = false
     private var enableLogDebug: Boolean = false
     private var restartIntent: Intent? = null
     private var onCompleteListener: OnCompleteListener? = null
+    private var customRestoreDialogTitle: String = "Choose file to restore"
+    private var customBackupFileName: String? = null
 
     fun context(context: Context): RoomBackup {
         this.context = context
@@ -42,11 +46,6 @@ class RoomBackup {
 
     fun database(roomDatabase: RoomDatabase): RoomBackup {
         this.roomDatabase = roomDatabase
-        return this
-    }
-
-    fun enableToastDebug(enableToastDebug: Boolean): RoomBackup {
-        this.enableToastDebug = enableToastDebug
         return this
     }
 
@@ -75,17 +74,29 @@ class RoomBackup {
         return this
     }
 
+    fun customLogTag(customLogTag: String): RoomBackup {
+        TAG = customLogTag
+        return this
+    }
 
-    private lateinit var dbName: String
-    private lateinit var BACKUP_PATH: String
-    private lateinit var DATABASE_PATH: Path
+    fun customRestoreDialogTitle(customRestoreDialogTitle: String): RoomBackup {
+        this.customRestoreDialogTitle = customRestoreDialogTitle
+        return this
+    }
+
+    fun customBackupFileName(customBackupFileName: String): RoomBackup {
+        this.customBackupFileName = customBackupFileName
+        return this
+    }
 
     private fun initRoomBackup(): Boolean {
         if (context == null) {
+            if (enableLogDebug) Log.d(TAG, "context is missing")
             onCompleteListener?.onComplete(false, "context is missing")
             return false
         }
         if (roomDatabase == null) {
+            if (enableLogDebug) Log.d(TAG, "roomDatabase is missing")
             onCompleteListener?.onComplete(false, "roomDatabase is missing")
             return false
         }
@@ -93,6 +104,10 @@ class RoomBackup {
         dbName = roomDatabase!!.openHelper.databaseName
         BACKUP_PATH = "${context!!.filesDir}/databasebackup/"
         DATABASE_PATH = Paths.get(context!!.getDatabasePath(dbName).toURI())
+        if (enableLogDebug) {
+            Log.d(TAG, "DatabaseName: $dbName")
+            Log.d(TAG, "Database Location: $DATABASE_PATH")
+        }
         return true
     }
 
@@ -105,6 +120,7 @@ class RoomBackup {
     }
 
     fun backup() {
+        if (enableLogDebug) Log.d(TAG, "Starting Backup ...")
         val success = initRoomBackup()
         if (!success) return
 
@@ -118,8 +134,8 @@ class RoomBackup {
         } catch (e: IOException) {
         }
 
-        //Create name for backup file: Databasename + currentTime + .sqlite3
-        val filename = "$dbName-${getTime()}.sqlite3"
+        //Create name for backup file, if no custom name is set: Databasename + currentTime + .sqlite3
+        val filename = if (customBackupFileName == null) "$dbName-${getTime()}.sqlite3" else customBackupFileName as String
 
         //Path to save current database
         val backuppath = Paths.get("$BACKUP_PATH$filename")
@@ -128,14 +144,9 @@ class RoomBackup {
         //Copy current database to save location (/files dir)
         Files.copy(DATABASE_PATH, backuppath, StandardCopyOption.REPLACE_EXISTING)
 
-        if (enableToastDebug) Toast.makeText(context, "Saved to: $backuppath", Toast.LENGTH_LONG).show()
         if (enableLogDebug) Log.d(TAG, "Saved to: $backuppath")
-
-
         onCompleteListener?.onComplete(true, "success")
-
     }
-
 
     /*---------------------Get current Date / Time --------------------------*/
     private fun getTime(): String {
@@ -148,9 +159,8 @@ class RoomBackup {
 
     }
 
-
     fun restore() {
-
+        if (enableLogDebug) Log.d(TAG, "Starting Restore ...")
         val success = initRoomBackup()
         if (!success) return
 
@@ -160,7 +170,9 @@ class RoomBackup {
 
         //If array is null or empty show "error" and return
         if (arrayOfFiles.isNullOrEmpty()) {
-            onCompleteListener?.onComplete(false, "No Backups available")
+            if (enableLogDebug) Log.d(TAG, "No backups available to restore")
+            onCompleteListener?.onComplete(false, "No backups available")
+            Toast.makeText(context, "No backups available to restore", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -182,7 +194,7 @@ class RoomBackup {
 
         //Show MaterialAlertDialog, with all available files, and on click Listener
         MaterialAlertDialogBuilder(context)
-            .setTitle("Choose File to Restore")
+            .setTitle(customRestoreDialogTitle)
             .setItems(filesStringArray) { _, which ->
                 restoreSelectedFile(filesStringArray[which])
             }
@@ -191,6 +203,7 @@ class RoomBackup {
 
     /*---------------------restore selected file--------------------------*/
     private fun restoreSelectedFile(filename: String) {
+        if (enableLogDebug) Log.d(TAG, "Restore selected file...")
         //Close the database
         roomDatabase!!.close()
 
@@ -201,11 +214,7 @@ class RoomBackup {
         //Copy back database and replace current database
         Files.copy(backuppath, DATABASE_PATH, StandardCopyOption.REPLACE_EXISTING)
 
-
-        if (enableToastDebug) Toast.makeText(context, "Restored File: $backuppath", Toast.LENGTH_LONG).show()
         if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
-
-
         onCompleteListener?.onComplete(true, "success")
 
     }

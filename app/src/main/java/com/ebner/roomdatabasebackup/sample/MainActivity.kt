@@ -5,9 +5,7 @@ import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -72,11 +70,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(true)
-                .enableToastDebug(true)
                 .apply {
-                    onCompleteListener { success, message ->
-                        Toast.makeText(this@MainActivity, "backup: $message", Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "backup: $message")
+                    onCompleteListener { success, _ ->
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
                 }
@@ -89,11 +84,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(true)
-                .enableToastDebug(true)
                 .apply {
-                    onCompleteListener { success, message ->
-                        Toast.makeText(this@MainActivity, "restore: $message", Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "restore: $message")
+                    onCompleteListener { success, _ ->
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
 
