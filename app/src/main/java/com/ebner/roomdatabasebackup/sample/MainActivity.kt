@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ebner.roomdatabasebackup.core.OnCompleteListener
 import com.ebner.roomdatabasebackup.core.RoomBackup
 import com.ebner.roomdatabasebackup.sample.database.main.FruitDatabase
 import com.ebner.roomdatabasebackup.sample.database.table.Fruit.Fruit
@@ -75,12 +74,10 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .enableLogDebug(true)
                 .enableToastDebug(true)
                 .restartOnComplete(true, Intent(this, MainActivity::class.java))
-                .onCompleteListener(object : OnCompleteListener {
-                    override fun onComplete(success: Boolean, message: String) {
-                        Toast.makeText(this@MainActivity, "backup: $message", Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "backup: $message")
-                    }
-                })
+                .onCompleteListener { success, message ->
+                    Toast.makeText(this@MainActivity, "backup: $message", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "backup: $message")
+                }
                 .backup()
 
 
@@ -92,12 +89,10 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .enableLogDebug(true)
                 .enableToastDebug(true)
                 .restartOnComplete(true, Intent(this, MainActivity::class.java))
-                .onCompleteListener(object : OnCompleteListener {
-                    override fun onComplete(success: Boolean, message: String) {
-                        Toast.makeText(this@MainActivity, "restore: $message", Toast.LENGTH_SHORT).show()
-                        Log.d(TAG, "restore: $message")
-                    }
-                })
+                .onCompleteListener { success, message ->
+                    Toast.makeText(this@MainActivity, "restore: $message", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "restore: $message")
+                }
                 .restore()
         }
 

@@ -73,6 +73,16 @@ class RoomBackup {
         return this
     }
 
+    fun onCompleteListener(listener: (success: Boolean, message: String) -> Unit): RoomBackup {
+        this.onCompleteListener = object : OnCompleteListener {
+            override fun onComplete(success: Boolean, message: String) {
+                listener(success, message)
+            }
+        }
+        return this
+    }
+
+
     private lateinit var dbName: String
     private lateinit var BACKUP_PATH: String
     private lateinit var DATABASE_PATH: Path
