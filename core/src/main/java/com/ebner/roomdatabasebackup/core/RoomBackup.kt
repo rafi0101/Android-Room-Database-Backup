@@ -30,7 +30,6 @@ class RoomBackup {
 
     private var context: Context? = null
     private var roomDatabase: RoomDatabase? = null
-    private var secretKey: String? = null
     private var enableToastDebug: Boolean = false
     private var enableLogDebug: Boolean = false
     private var restartIntent: Intent? = null
@@ -43,11 +42,6 @@ class RoomBackup {
 
     fun database(roomDatabase: RoomDatabase): RoomBackup {
         this.roomDatabase = roomDatabase
-        return this
-    }
-
-    fun secretKey(secretKey: String): RoomBackup {
-        this.secretKey = secretKey
         return this
     }
 
