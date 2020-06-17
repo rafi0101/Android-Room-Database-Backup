@@ -33,7 +33,6 @@ class RoomBackup {
     private var secretKey: String? = null
     private var enableToastDebug: Boolean = false
     private var enableLogDebug: Boolean = false
-    private var restartOnComplete: Boolean = true
     private var restartIntent: Intent? = null
     private var onCompleteListener: OnCompleteListener? = null
 
@@ -62,9 +61,9 @@ class RoomBackup {
         return this
     }
 
-    fun restartOnComplete(restartOnComplete: Boolean, restartIntent: Intent): RoomBackup {
-        this.restartOnComplete = restartOnComplete
+    fun restartApp(restartIntent: Intent): RoomBackup {
         this.restartIntent = restartIntent
+        restartApp()
         return this
     }
 
@@ -94,10 +93,6 @@ class RoomBackup {
         }
         if (roomDatabase == null) {
             onCompleteListener?.onComplete(false, "roomDatabase is missing")
-            return false
-        }
-        if (restartOnComplete && restartIntent == null) {
-            onCompleteListener?.onComplete(false, "intent to restart is missing")
             return false
         }
 
@@ -144,7 +139,6 @@ class RoomBackup {
 
 
         onCompleteListener?.onComplete(true, "success")
-        if (restartOnComplete) restartApp()
 
     }
 
@@ -219,7 +213,6 @@ class RoomBackup {
 
 
         onCompleteListener?.onComplete(true, "success")
-        if (restartOnComplete) restartApp()
 
     }
 

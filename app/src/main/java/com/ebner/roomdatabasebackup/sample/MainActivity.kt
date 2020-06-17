@@ -73,10 +73,12 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(true)
                 .enableToastDebug(true)
-                .restartOnComplete(true, Intent(this, MainActivity::class.java))
-                .onCompleteListener { success, message ->
-                    Toast.makeText(this@MainActivity, "backup: $message", Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, "backup: $message")
+                .apply {
+                    onCompleteListener { success, message ->
+                        Toast.makeText(this@MainActivity, "backup: $message", Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "backup: $message")
+                        if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
+                    }
                 }
                 .backup()
 
@@ -88,10 +90,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(true)
                 .enableToastDebug(true)
-                .restartOnComplete(true, Intent(this, MainActivity::class.java))
-                .onCompleteListener { success, message ->
-                    Toast.makeText(this@MainActivity, "restore: $message", Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, "restore: $message")
+                .apply {
+                    onCompleteListener { success, message ->
+                        Toast.makeText(this@MainActivity, "restore: $message", Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "restore: $message")
+                        if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
+                    }
+
                 }
                 .restore()
         }
