@@ -7,15 +7,16 @@
     android:paddingBottom="16dp"
     tools:context=".MainActivityJava">
 
-    
+
+
         <Button
-            android:id="@+id/btn_backup"
+            android:id="@+id/btn_backup_intern"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
-            android:text="Backup"
+            android:text="Backup (Intern)"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@android:color/white"
@@ -23,13 +24,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/btn_restore"
+            android:id="@+id/btn_restore_intern"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:layout_marginEnd="32dp"
-            android:text="Restore"
+            android:layout_marginEnd="16dp"
+            android:text="Restore (Intern)"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@android:color/white"
@@ -37,31 +38,56 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/btn_kotlin"
+            android:id="@+id/btn_backup_extern"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Backup (Extern)"
+            android:textAllCaps="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@android:color/white"
+            app:layout_constraintStart_toStartOf="@+id/btn_backup_intern"
+            app:layout_constraintTop_toBottomOf="@+id/btn_backup_intern" />
+
+        <Button
+            android:id="@+id/btn_restore_extern"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Restore (Extern)"
+            android:textAllCaps="false"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="@+id/btn_restore_intern"
+            app:layout_constraintTop_toBottomOf="@+id/btn_restore_intern" />
+
+        <Button
+            android:id="@+id/btn_kotlin"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:text="switch to Kotlin"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@android:color/white"
-            app:layout_constraintEnd_toStartOf="@+id/btn_restore"
-            app:layout_constraintStart_toEndOf="@+id/btn_backup"
-            app:layout_constraintTop_toTopOf="@+id/btn_backup" />
+            app:layout_constraintEnd_toStartOf="@+id/btn_restore_intern"
+            app:layout_constraintStart_toEndOf="@+id/btn_backup_intern"
+            app:layout_constraintTop_toTopOf="@+id/btn_backup_intern" />
 
 
         <TextView
             android:id="@+id/tv_fruits"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:text="Fruits List (Java)"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            app:layout_constraintEnd_toStartOf="@+id/btn_restore"
-            app:layout_constraintStart_toEndOf="@+id/btn_backup"
-            app:layout_constraintTop_toBottomOf="@+id/btn_backup" />
+            app:layout_constraintEnd_toStartOf="@+id/btn_restore_intern"
+            app:layout_constraintStart_toEndOf="@+id/btn_backup_intern"
+            app:layout_constraintTop_toBottomOf="@+id/btn_backup_extern" />
 
 
         <androidx.recyclerview.widget.RecyclerView

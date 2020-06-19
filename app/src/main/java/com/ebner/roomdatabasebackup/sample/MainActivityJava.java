@@ -43,8 +43,10 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         /*---------------------Link items to Layout--------------------------*/
         RecyclerView recyclerView = findViewById(R.id.rv_fruits);
         FloatingActionButton fab = findViewById(R.id.btn_addFruit);
-        Button btn_backup = findViewById(R.id.btn_backup);
-        Button btn_restore = findViewById(R.id.btn_restore);
+        Button btn_backup_intern = findViewById(R.id.btn_backup_intern);
+        Button btn_restore_intern = findViewById(R.id.btn_restore_intern);
+        Button btn_backup_extern = findViewById(R.id.btn_backup_extern);
+        Button btn_restore_extern = findViewById(R.id.btn_restore_extern);
         Button btn_kotlin = findViewById(R.id.btn_kotlin);
 
 
@@ -83,7 +85,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         });
 
         /*---------------------Backup and Restore Database--------------------------*/
-        btn_backup.setOnClickListener(new View.OnClickListener() {
+        btn_backup_intern.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final RoomBackup roomBackup = new RoomBackup();
@@ -102,13 +104,53 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             }
         });
 
-        btn_restore.setOnClickListener(new View.OnClickListener() {
+        btn_restore_intern.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final RoomBackup roomBackup = new RoomBackup();
                 roomBackup.context(MainActivityJava.this);
                 roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
                 roomBackup.enableLogDebug(true);
+                roomBackup.onCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(boolean success, @NotNull String message) {
+                        Log.d(TAG, "oncomplete + mesage " + success + message);
+                        if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
+                    }
+                });
+                roomBackup.restore();
+
+            }
+        });
+
+        btn_backup_extern.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final RoomBackup roomBackup = new RoomBackup();
+                roomBackup.context(MainActivityJava.this);
+                roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
+                roomBackup.enableLogDebug(true);
+                roomBackup.exportToExternalStorage(true);
+                roomBackup.onCompleteListener(new OnCompleteListener() {
+                    @Override
+                    public void onComplete(boolean success, @NotNull String message) {
+                        Log.d(TAG, "oncomplete + mesage " + success + message);
+                        if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
+                    }
+                });
+                roomBackup.backup();
+
+            }
+        });
+
+        btn_restore_extern.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final RoomBackup roomBackup = new RoomBackup();
+                roomBackup.context(MainActivityJava.this);
+                roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
+                roomBackup.enableLogDebug(true);
+                roomBackup.importFromExternalStorage(true);
                 roomBackup.onCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(boolean success, @NotNull String message) {

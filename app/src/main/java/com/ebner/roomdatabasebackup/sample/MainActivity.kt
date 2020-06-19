@@ -43,8 +43,10 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         clMain = findViewById(R.id.cl_main)
         val recyclerView: RecyclerView = findViewById(R.id.rv_fruits)
         val fab: FloatingActionButton = findViewById(R.id.btn_addFruit)
-        val btn_backup: Button = findViewById(R.id.btn_backup)
-        val btn_restore: Button = findViewById(R.id.btn_restore)
+        val btn_backup_intern: Button = findViewById(R.id.btn_backup_intern)
+        val btn_restore_intern: Button = findViewById(R.id.btn_restore_intern)
+        val btn_backup_extern: Button = findViewById(R.id.btn_backup_extern)
+        val btn_restore_extern: Button = findViewById(R.id.btn_restore_extern)
         val btn_java: Button = findViewById(R.id.btn_java)
 
         val adapter = FruitListAdapter(this)
@@ -72,7 +74,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         }
 
         /*---------------------Backup and Restore Database--------------------------*/
-        btn_backup.setOnClickListener {
+        btn_backup_intern.setOnClickListener {
             RoomBackup()
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
@@ -86,11 +88,41 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
 
         }
-        btn_restore.setOnClickListener {
+        btn_restore_intern.setOnClickListener {
             RoomBackup()
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(true)
+                .apply {
+                    onCompleteListener { success, _ ->
+                        if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
+                    }
+
+                }
+                .restore()
+        }
+
+        btn_backup_extern.setOnClickListener {
+            RoomBackup()
+                .context(this)
+                .database(FruitDatabase.getInstance(this))
+                .enableLogDebug(true)
+                .exportToExternalStorage(true)
+                .apply {
+                    onCompleteListener { success, _ ->
+                        if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
+                    }
+                }
+                .backup()
+
+
+        }
+        btn_restore_extern.setOnClickListener {
+            RoomBackup()
+                .context(this)
+                .database(FruitDatabase.getInstance(this))
+                .enableLogDebug(true)
+                .importFromExternalStorage(true)
                 .apply {
                     onCompleteListener { success, _ ->
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
