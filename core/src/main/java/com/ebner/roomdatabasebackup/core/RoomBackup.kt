@@ -18,13 +18,22 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.Comparator
 
-
 /**
- * Created by raphael on 11.06.2020.
- * Android Room Database Backup Created in com.ebner.roomdatabasebackup.core
+ * Copyright 2020 Raphael Ebner
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 class RoomBackup {
-
 
     private var TAG = "debug_RoomBackup"
     private lateinit var dbName: String
@@ -39,32 +48,62 @@ class RoomBackup {
     private var customRestoreDialogTitle: String = "Choose file to restore"
     private var customBackupFileName: String? = null
 
+    /**
+     * Set Context
+     *
+     * @param context Context
+     */
     fun context(context: Context): RoomBackup {
         this.context = context
         return this
     }
 
+    /**
+     * Set RoomDatabase instance
+     *
+     * @param roomDatabase RoomDatabase
+     */
     fun database(roomDatabase: RoomDatabase): RoomBackup {
         this.roomDatabase = roomDatabase
         return this
     }
 
+    /**
+     * Set LogDebug enabled / disabled
+     *
+     * @param enableLogDebug Boolean
+     */
     fun enableLogDebug(enableLogDebug: Boolean): RoomBackup {
         this.enableLogDebug = enableLogDebug
         return this
     }
 
+    /**
+     * Set Intent in which to boot after App restart
+     *
+     * @param restartIntent Intent
+     */
     fun restartApp(restartIntent: Intent): RoomBackup {
         this.restartIntent = restartIntent
         restartApp()
         return this
     }
 
+    /**
+     * Set onCompleteListener, to run code when tasks completed
+     *
+     * @param onCompleteListener OnCompleteListener
+     */
     fun onCompleteListener(onCompleteListener: OnCompleteListener): RoomBackup {
         this.onCompleteListener = onCompleteListener
         return this
     }
 
+    /**
+     * Set onCompleteListener, to run code when tasks completed
+     *
+     * @param listener (success: Boolean, message: String) -> Unit
+     */
     fun onCompleteListener(listener: (success: Boolean, message: String) -> Unit): RoomBackup {
         this.onCompleteListener = object : OnCompleteListener {
             override fun onComplete(success: Boolean, message: String) {
@@ -74,21 +113,39 @@ class RoomBackup {
         return this
     }
 
+    /**
+     * Set custom log tag, for detailed debugging
+     *
+     * @param customLogTag String
+     */
     fun customLogTag(customLogTag: String): RoomBackup {
         TAG = customLogTag
         return this
     }
 
+    /**
+     * Set custom Restore Dialog Title, default = "Choose file to restore"
+     *
+     * @param customRestoreDialogTitle String
+     */
     fun customRestoreDialogTitle(customRestoreDialogTitle: String): RoomBackup {
         this.customRestoreDialogTitle = customRestoreDialogTitle
         return this
     }
 
+    /**
+     * Set custom Backup File Name, default = "$dbName-$currentTime.sqlite3"
+     *
+     * @param customBackupFileName String
+     */
     fun customBackupFileName(customBackupFileName: String): RoomBackup {
         this.customBackupFileName = customBackupFileName
         return this
     }
 
+    /**
+     * Init vars, and return true if no error occurred
+     */
     private fun initRoomBackup(): Boolean {
         if (context == null) {
             if (enableLogDebug) Log.d(TAG, "context is missing")
@@ -111,6 +168,9 @@ class RoomBackup {
         return true
     }
 
+    /**
+     * restart App with custom Intent
+     */
     private fun restartApp() {
         restartIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context!!.startActivity(restartIntent)
@@ -119,6 +179,9 @@ class RoomBackup {
 
     }
 
+    /**
+     * Start Backup process, and set onComplete Listener to success, if no error occurred, else onComplete Listener success is false and error message is passed
+     */
     fun backup() {
         if (enableLogDebug) Log.d(TAG, "Starting Backup ...")
         val success = initRoomBackup()
@@ -148,7 +211,9 @@ class RoomBackup {
         onCompleteListener?.onComplete(true, "success")
     }
 
-    /*---------------------Get current Date / Time --------------------------*/
+    /**
+     * @return current time formatted as String
+     */
     private fun getTime(): String {
 
         val currentTime = LocalDateTime.now()
@@ -159,6 +224,11 @@ class RoomBackup {
 
     }
 
+    /**
+     * Start Restore process, and set onComplete Listener to success, if no error occurred, else onComplete Listener success is false and error message is passed
+     * this function shows a list of all available backup files in a MaterialAlertDialog
+     * and calls restoreSelectedFile(filename) to restore selected file
+     */
     fun restore() {
         if (enableLogDebug) Log.d(TAG, "Starting Restore ...")
         val success = initRoomBackup()
@@ -201,7 +271,11 @@ class RoomBackup {
             .show()
     }
 
-    /*---------------------restore selected file--------------------------*/
+    /**
+     * Restores the selected file
+     *
+     * @param filename String
+     */
     private fun restoreSelectedFile(filename: String) {
         if (enableLogDebug) Log.d(TAG, "Restore selected file...")
         //Close the database
