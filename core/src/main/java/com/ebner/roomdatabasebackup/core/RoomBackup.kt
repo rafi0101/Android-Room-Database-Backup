@@ -37,7 +37,8 @@ class RoomBackup {
 
     private var TAG = "debug_RoomBackup"
     private lateinit var dbName: String
-    private lateinit var BACKUP_PATH: String
+    private lateinit var INTERNAL_BACKUP_PATH: String
+    private lateinit var EXTERNAL_BACKUP_PATH: File
     private lateinit var DATABASE_PATH: Path
 
     private var context: Context? = null
@@ -47,6 +48,8 @@ class RoomBackup {
     private var onCompleteListener: OnCompleteListener? = null
     private var customRestoreDialogTitle: String = "Choose file to restore"
     private var customBackupFileName: String? = null
+    private var exportToExternalStorage: Boolean = false
+    private var importFromExternalStorage: Boolean = false
 
     /**
      * Set Context
@@ -144,6 +147,29 @@ class RoomBackup {
     }
 
     /**
+     * Set export To External Storage enabled / disabled, if you want to export the backup to external storage
+     * then you have access to the backup and can save it somewhere else
+     *
+     *
+     * @param exportToExternalStorage Boolean, default = false
+     */
+    fun exportToExternalStorage(exportToExternalStorage: Boolean): RoomBackup {
+        this.exportToExternalStorage = exportToExternalStorage
+        return this
+    }
+
+    /**
+     * Set import From External Storage enabled / disabled, if you want to restore the backup from external storage
+     *
+     *
+     * @param importFromExternalStorage Boolean, default = false
+     */
+    fun importFromExternalStorage(importFromExternalStorage: Boolean): RoomBackup {
+        this.importFromExternalStorage = importFromExternalStorage
+        return this
+    }
+
+    /**
      * Init vars, and return true if no error occurred
      */
     private fun initRoomBackup(): Boolean {
@@ -159,7 +185,8 @@ class RoomBackup {
         }
 
         dbName = roomDatabase!!.openHelper.databaseName
-        BACKUP_PATH = "${context!!.filesDir}/databasebackup/"
+        INTERNAL_BACKUP_PATH = "${context!!.filesDir}/databasebackup/"
+        EXTERNAL_BACKUP_PATH = context?.getExternalFilesDir("backup")!!
         DATABASE_PATH = Paths.get(context!!.getDatabasePath(dbName).toURI())
         if (enableLogDebug) {
             Log.d(TAG, "DatabaseName: $dbName")
@@ -190,9 +217,9 @@ class RoomBackup {
         //Close the database
         roomDatabase!!.close()
 
-        //Create backup directory if does not exist
+        //Create internal backup directory if does not exist
         try {
-            Files.createDirectory(Paths.get((BACKUP_PATH)))
+            Files.createDirectory(Paths.get((INTERNAL_BACKUP_PATH)))
         } catch (e: FileAlreadyExistsException) {
         } catch (e: IOException) {
         }
@@ -201,8 +228,7 @@ class RoomBackup {
         val filename = if (customBackupFileName == null) "$dbName-${getTime()}.sqlite3" else customBackupFileName as String
 
         //Path to save current database
-        val backuppath = Paths.get("$BACKUP_PATH$filename")
-
+        val backuppath = if (exportToExternalStorage) Paths.get("$EXTERNAL_BACKUP_PATH/$filename") else Paths.get("$INTERNAL_BACKUP_PATH$filename")
 
         //Copy current database to save location (/files dir)
         Files.copy(DATABASE_PATH, backuppath, StandardCopyOption.REPLACE_EXISTING)
@@ -234,7 +260,9 @@ class RoomBackup {
         val success = initRoomBackup()
         if (!success) return
 
-        val backupDirectory = File(BACKUP_PATH)
+        //Path of Backup Directory
+        val backupDirectory = if (importFromExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else File(INTERNAL_BACKUP_PATH)
+
         //All Files in an Array of type File
         val arrayOfFiles = backupDirectory.listFiles()
 
@@ -281,9 +309,11 @@ class RoomBackup {
         //Close the database
         roomDatabase!!.close()
 
-
-        //Backup location
-        val backuppath = Paths.get("$BACKUP_PATH$filename")
+        val backuppath = if (importFromExternalStorage) {
+            Paths.get("$EXTERNAL_BACKUP_PATH/$filename")
+        } else {
+            Paths.get("$INTERNAL_BACKUP_PATH$filename")
+        }
 
         //Copy back database and replace current database
         Files.copy(backuppath, DATABASE_PATH, StandardCopyOption.REPLACE_EXISTING)
