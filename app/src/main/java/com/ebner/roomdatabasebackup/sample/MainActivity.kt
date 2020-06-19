@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         val fab: FloatingActionButton = findViewById(R.id.btn_addFruit)
         val btn_backup: Button = findViewById(R.id.btn_backup)
         val btn_restore: Button = findViewById(R.id.btn_restore)
+        val btn_java: Button = findViewById(R.id.btn_java)
 
         val adapter = FruitListAdapter(this)
         recyclerView.adapter = adapter
@@ -63,8 +64,14 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
             startActivityForResult(intent, ADD_FRUIT_REQUEST)
         }
 
-        /*---------------------Backup and Restore Database--------------------------*/
+        /*---------------------go to Java MainActivity--------------------------*/
+        btn_java.setOnClickListener {
+            finish()
+            val intent = Intent(this, MainActivityJava::class.java)
+            startActivity(intent)
+        }
 
+        /*---------------------Backup and Restore Database--------------------------*/
         btn_backup.setOnClickListener {
             RoomBackup()
                 .context(this)

@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/cl_main"
     android:paddingBottom="16dp"
-    tools:context=".MainActivity">
+    tools:context=".MainActivityJava">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
+    
         <Button
             android:id="@+id/btn_backup"
             style="@style/Widget.MaterialComponents.Button"
@@ -42,13 +37,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/btn_java"
+            android:id="@+id/btn_kotlin"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:text="switch to Java"
+            android:text="switch to Kotlin"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="@android:color/white"
@@ -56,12 +51,13 @@
             app:layout_constraintStart_toEndOf="@+id/btn_backup"
             app:layout_constraintTop_toTopOf="@+id/btn_backup" />
 
+
         <TextView
             android:id="@+id/tv_fruits"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="Fruits List (Kotlin)"
+            android:text="Fruits List (Java)"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:layout_constraintEnd_toStartOf="@+id/btn_restore"
             app:layout_constraintStart_toEndOf="@+id/btn_backup"
@@ -81,15 +77,16 @@
             tools:listitem="@layout/content_fruit_list" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_addFruit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="32dp"
-        android:src="@drawable/ic_add" />
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/ic_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
