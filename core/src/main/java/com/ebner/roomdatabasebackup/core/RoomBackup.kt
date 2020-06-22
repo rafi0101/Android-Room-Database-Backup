@@ -6,8 +6,9 @@ import android.content.SharedPreferences
 import android.util.Log
 import android.widget.Toast
 import androidx.room.RoomDatabase
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.IOException
@@ -37,15 +38,18 @@ import kotlin.Comparator
  */
 class RoomBackup {
 
-    private val SHARED_PREFS = "ardbbackup"
+    companion object {
+        private const val SHARED_PREFS = "com.ebner.roomdatabasebackup"
+        private var TAG = "debug_RoomBackup"
+        private lateinit var INTERNAL_BACKUP_PATH: Path
+        private lateinit var TEMP_BACKUP_PATH: Path
+        private lateinit var TEMP_BACKUP_FILE: Path
+        private lateinit var EXTERNAL_BACKUP_PATH: Path
+        private lateinit var DATABASE_FILE: Path
+    }
+
     private lateinit var sharedPreferences: SharedPreferences
-    private var TAG = "debug_RoomBackup"
     private lateinit var dbName: String
-    private lateinit var INTERNAL_BACKUP_PATH: Path
-    private lateinit var TEMP_BACKUP_PATH: Path
-    private lateinit var TEMP_BACKUP_FILE: Path
-    private lateinit var EXTERNAL_BACKUP_PATH: Path
-    private lateinit var DATABASE_FILE: Path
 
     private var context: Context? = null
     private var roomDatabase: RoomDatabase? = null
@@ -203,7 +207,20 @@ class RoomBackup {
             return false
         }
 
-        sharedPreferences = context!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+        //Create or retrieve the Master Key for encryption/decryption
+        val masterKeyAlias = MasterKey.Builder(context!!)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        //Initialize/open an instance of EncryptedSharedPreferences
+        //Encryption key is stored in plain text in an EncryptedSharedPreferences --> it is saved encrypted
+        sharedPreferences = EncryptedSharedPreferences.create(
+            context!!,
+            SHARED_PREFS,
+            masterKeyAlias,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
 
         dbName = roomDatabase!!.openHelper.databaseName
         INTERNAL_BACKUP_PATH = Paths.get("${context!!.filesDir}/databasebackup/")
@@ -282,14 +299,13 @@ class RoomBackup {
             Files.copy(DATABASE_FILE, TEMP_BACKUP_FILE, StandardCopyOption.REPLACE_EXISTING)
 
             //encrypt temp file, and save it to backup location
-            val encryptDecryptBackup = EncryptDecryptBackup()
+            val encryptDecryptBackup = AESEncryptionHelper()
             val fileData = encryptDecryptBackup.readFile(TEMP_BACKUP_FILE)
-            //get secret key
-            val secretKey = encryptDecryptBackup.getSecretKey(sharedPreferences)
-            //encrypt file
-            val encodedData = encryptDecryptBackup.encrypt(secretKey, fileData)
 
-            encryptDecryptBackup.saveFile(encodedData, backuppath.toString())
+            val aesEncryptionManager = AESEncryptionManager()
+            val encryptedBytes = aesEncryptionManager.encryptData(sharedPreferences, fileData)
+
+            encryptDecryptBackup.saveFile(encryptedBytes, backuppath)
 
             //Delete temp file
             Files.delete(TEMP_BACKUP_FILE)
@@ -315,14 +331,13 @@ class RoomBackup {
             Files.copy(backuppath, TEMP_BACKUP_FILE, StandardCopyOption.REPLACE_EXISTING)
 
             //Decrypt temp file, and save it to database location
-            val encryptDecryptBackup = EncryptDecryptBackup()
+            val encryptDecryptBackup = AESEncryptionHelper()
             val fileData = encryptDecryptBackup.readFile(TEMP_BACKUP_FILE)
-            val secretKey = encryptDecryptBackup.getSecretKey(sharedPreferences)
-            var decodedData: ByteArray? = null
-            runBlocking(Dispatchers.IO) {
-                decodedData = encryptDecryptBackup.decrypt(secretKey, fileData)
-            }
-            encryptDecryptBackup.saveFile(decodedData!!, DATABASE_FILE.toString())
+
+            val aesEncryptionManager = AESEncryptionManager()
+            val decryptedBytes = aesEncryptionManager.decryptData(sharedPreferences, fileData)
+
+            encryptDecryptBackup.saveFile(decryptedBytes, DATABASE_FILE)
 
             //Delete tem file
             Files.delete(TEMP_BACKUP_FILE)
