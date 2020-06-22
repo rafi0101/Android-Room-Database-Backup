@@ -1,11 +1,16 @@
 package com.ebner.roomdatabasebackup.sample;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,9 +24,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ebner.roomdatabasebackup.core.OnCompleteListener;
 import com.ebner.roomdatabasebackup.core.RoomBackup;
 import com.ebner.roomdatabasebackup.sample.database.main.FruitDatabase;
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.Fruit;
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.FruitListAdapter;
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.FruitViewModel;
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.Fruit;
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.FruitListAdapter;
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,13 +36,13 @@ import java.util.List;
 
 /**
  * Copyright 2020 Raphael Ebner
-
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,19 +56,24 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
     private static final String TAG = "debug_MainActivityJava";
     private FruitViewModel fruitViewModel;
 
+    private boolean encryptBackup;
+    private boolean useExternalStorage;
+    private boolean enableLog;
+
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_java);
+        setContentView(R.layout.activity_main);
 
         /*---------------------Link items to Layout--------------------------*/
         RecyclerView recyclerView = findViewById(R.id.rv_fruits);
         FloatingActionButton fab = findViewById(R.id.btn_addFruit);
-        Button btn_backup_intern = findViewById(R.id.btn_backup_intern);
-        Button btn_restore_intern = findViewById(R.id.btn_restore_intern);
-        Button btn_backup_extern = findViewById(R.id.btn_backup_extern);
-        Button btn_restore_extern = findViewById(R.id.btn_restore_extern);
-        Button btn_kotlin = findViewById(R.id.btn_kotlin);
+        Button btn_backup = findViewById(R.id.btn_backup);
+        Button btn_restore = findViewById(R.id.btn_restore);
+        Button btn_language = findViewById(R.id.btn_switch_language);
+        Button btn_properties = findViewById(R.id.btn_properties);
+        TextView tvFruits = findViewById(R.id.tv_fruits);
 
 
         final FruitListAdapter adapter = new FruitListAdapter(this);
@@ -79,6 +90,15 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             }
         });
 
+        tvFruits.setText("Fruits List (Java)");
+        btn_language.setText("switch to Kotlin");
+
+        String SHARED_PREFS = "sampleBackup";
+        final String spEncryptBackup = "encryptBackup";
+        final String spUseExternalStorage = "useExternalStorage";
+        final String spEnableLog = "enableLog";
+        final SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+
         /*---------------------FAB Add Button--------------------------*/
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,7 +110,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         });
 
         /*---------------------go to Kotlin MainActivity--------------------------*/
-        btn_kotlin.setOnClickListener(new View.OnClickListener() {
+        btn_language.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -99,18 +119,65 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             }
         });
 
+
+        encryptBackup = sharedPreferences.getBoolean(spEncryptBackup, true);
+        useExternalStorage = sharedPreferences.getBoolean(spUseExternalStorage, false);
+        enableLog = sharedPreferences.getBoolean(spEnableLog, true);
+
+        final String[] multiItems = new String[]{"Encrypt Backup", "use External Storage", "enable Log"};
+        final boolean[] checkedItems = new boolean[]{encryptBackup, useExternalStorage, enableLog};
+
+        /*---------------------set Properties--------------------------*/
+        btn_properties.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivityJava.this);
+                materialAlertDialogBuilder.setTitle("Change Properties");
+                materialAlertDialogBuilder.setPositiveButton("Ok", null);
+
+                materialAlertDialogBuilder.setMultiChoiceItems(multiItems, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        switch (which) {
+                            case 0:
+                                encryptBackup = isChecked;
+                                sharedPreferences.edit().putBoolean(spEncryptBackup, encryptBackup).apply();
+                                break;
+                            case 1:
+                                useExternalStorage = isChecked;
+                                sharedPreferences.edit().putBoolean(spUseExternalStorage, useExternalStorage).apply();
+                                break;
+                            case 2:
+                                enableLog = isChecked;
+                                sharedPreferences.edit().putBoolean(spEnableLog, enableLog).apply();
+                                break;
+                            default:
+                        }
+                    }
+                });
+                materialAlertDialogBuilder.show();
+
+            }
+        });
+
+
+
         /*---------------------Backup and Restore Database--------------------------*/
-        btn_backup_intern.setOnClickListener(new View.OnClickListener() {
+        btn_backup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final RoomBackup roomBackup = new RoomBackup();
                 roomBackup.context(MainActivityJava.this);
                 roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
-                roomBackup.enableLogDebug(true);
+                roomBackup.enableLogDebug(enableLog);
+                roomBackup.fileIsEncrypted(encryptBackup);
+                roomBackup.exportToExternalStorage(useExternalStorage);
                 roomBackup.onCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(boolean success, @NotNull String message) {
-                        Log.d(TAG, "oncomplete + mesage " + success + message);
+                        Log.d(TAG, "oncomplete: " + success + ", message: " + message);
                         if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
                     }
                 });
@@ -119,17 +186,19 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             }
         });
 
-        btn_restore_intern.setOnClickListener(new View.OnClickListener() {
+        btn_restore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final RoomBackup roomBackup = new RoomBackup();
                 roomBackup.context(MainActivityJava.this);
                 roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
-                roomBackup.enableLogDebug(true);
+                roomBackup.enableLogDebug(enableLog);
+                roomBackup.fileIsEncrypted(encryptBackup);
+                roomBackup.exportToExternalStorage(useExternalStorage);
                 roomBackup.onCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(boolean success, @NotNull String message) {
-                        Log.d(TAG, "oncomplete + mesage " + success + message);
+                        Log.d(TAG, "oncomplete: " + success + ", message: " + message);
                         if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
                     }
                 });
@@ -138,45 +207,6 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             }
         });
 
-        btn_backup_extern.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final RoomBackup roomBackup = new RoomBackup();
-                roomBackup.context(MainActivityJava.this);
-                roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
-                roomBackup.enableLogDebug(true);
-                roomBackup.exportToExternalStorage(true);
-                roomBackup.onCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(boolean success, @NotNull String message) {
-                        Log.d(TAG, "oncomplete + mesage " + success + message);
-                        if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
-                    }
-                });
-                roomBackup.backup();
-
-            }
-        });
-
-        btn_restore_extern.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final RoomBackup roomBackup = new RoomBackup();
-                roomBackup.context(MainActivityJava.this);
-                roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
-                roomBackup.enableLogDebug(true);
-                roomBackup.importFromExternalStorage(true);
-                roomBackup.onCompleteListener(new OnCompleteListener() {
-                    @Override
-                    public void onComplete(boolean success, @NotNull String message) {
-                        Log.d(TAG, "oncomplete + mesage " + success + message);
-                        if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
-                    }
-                });
-                roomBackup.restore();
-
-            }
-        });
 
         /*---------------------Swiping on a row--------------------------*/
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -190,6 +220,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                 int position = viewHolder.getAdapterPosition();
                 Fruit fruit = adapter.getFruitAt(position);
 
+                assert fruit != null;
                 fruitViewModel.delete(fruit);
             }
         }) {
@@ -207,6 +238,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         /*---------------------If the Request was successful--------------------------*/
         if (resultCode == Activity.RESULT_OK) {
+            assert data != null;
             String name = data.getStringExtra(ActivityAddEditFruit.EXTRA_NAME);
             Fruit fruit = null;
             fruit.setName(name);

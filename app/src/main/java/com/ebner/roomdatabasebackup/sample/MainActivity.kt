@@ -1,11 +1,15 @@
 package com.ebner.roomdatabasebackup.sample
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -16,9 +20,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ebner.roomdatabasebackup.core.RoomBackup
 import com.ebner.roomdatabasebackup.sample.database.main.FruitDatabase
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.Fruit
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.FruitListAdapter
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.FruitViewModel
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.Fruit
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.FruitListAdapter
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 
@@ -45,10 +50,10 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
     companion object {
         private const val ADD_FRUIT_REQUEST = 1
         private const val EDIT_FRUIT_REQUEST = 2
+        private const val TAG = "debug_MainActivity"
     }
 
-    private val TAG = "debug_MainActivity"
-
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -57,11 +62,11 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         clMain = findViewById(R.id.cl_main)
         val recyclerView: RecyclerView = findViewById(R.id.rv_fruits)
         val fab: FloatingActionButton = findViewById(R.id.btn_addFruit)
-        val btn_backup_intern: Button = findViewById(R.id.btn_backup_intern)
-        val btn_restore_intern: Button = findViewById(R.id.btn_restore_intern)
-        val btn_backup_extern: Button = findViewById(R.id.btn_backup_extern)
-        val btn_restore_extern: Button = findViewById(R.id.btn_restore_extern)
-        val btn_java: Button = findViewById(R.id.btn_java)
+        val btnBackup: Button = findViewById(R.id.btn_backup)
+        val btnRestore: Button = findViewById(R.id.btn_restore)
+        val btnProperties: Button = findViewById(R.id.btn_properties)
+        val btnLanguage: Button = findViewById(R.id.btn_switch_language)
+        val tvFruits: TextView = findViewById(R.id.tv_fruits)
 
         val adapter = FruitListAdapter(this)
         recyclerView.adapter = adapter
@@ -73,6 +78,14 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
             adapter.submitList(fruits)
         })
 
+        tvFruits.text = "Fruits List (Kotlin)"
+        btnLanguage.text = "switch to Java"
+
+        val sharedPrefs = "sampleBackup"
+        val spEncryptBackup = "encryptBackup"
+        val spUseExternalStorage = "useExternalStorage"
+        val spEnableLog = "enableLog"
+        val sharedPreferences = getSharedPreferences(sharedPrefs, Context.MODE_PRIVATE)
 
         /*---------------------FAB Add Button--------------------------*/
         fab.setOnClickListener {
@@ -81,20 +94,57 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         }
 
         /*---------------------go to Java MainActivity--------------------------*/
-        btn_java.setOnClickListener {
+        btnLanguage.setOnClickListener {
             finish()
             val intent = Intent(this, MainActivityJava::class.java)
             startActivity(intent)
         }
 
+        var encryptBackup = sharedPreferences.getBoolean(spEncryptBackup, true)
+        var useExternalStorage = sharedPreferences.getBoolean(spUseExternalStorage, false)
+        var enableLog = sharedPreferences.getBoolean(spEnableLog, true)
+
+
+        /*---------------------set Properties--------------------------*/
+        btnProperties.setOnClickListener {
+            val multiItems = arrayOf("Encrypt Backup", "use External Storage", "enable Log")
+            val checkedItems = booleanArrayOf(encryptBackup, useExternalStorage, enableLog)
+
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Change Properties")
+                .setPositiveButton("Ok", null)
+                //Multi-choice items (initialized with checked items)
+                .setMultiChoiceItems(multiItems, checkedItems) { _, which, checked ->
+                    // Respond to item chosen
+                    when(which){
+                        0 ->  {
+                            encryptBackup = checked
+                            sharedPreferences.edit().putBoolean(spEncryptBackup, encryptBackup).apply()
+                        }
+                        1 -> {
+                            useExternalStorage = checked
+                            sharedPreferences.edit().putBoolean(spUseExternalStorage, useExternalStorage).apply()
+                        }
+                        2 -> {
+                            enableLog = checked
+                            sharedPreferences.edit().putBoolean(spEnableLog, enableLog).apply()
+                        }
+                    }
+                }
+                .show()
+        }
+
         /*---------------------Backup and Restore Database--------------------------*/
-        btn_backup_intern.setOnClickListener {
+        btnBackup.setOnClickListener {
             RoomBackup()
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
-                .enableLogDebug(true)
+                .enableLogDebug(enableLog)
+                .fileIsEncrypted(encryptBackup)
+                .exportToExternalStorage(useExternalStorage)
                 .apply {
                     onCompleteListener { success, _ ->
+                        Log.d(TAG, "restarting app...")
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
                 }
@@ -102,41 +152,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
 
         }
-        btn_restore_intern.setOnClickListener {
+        btnRestore.setOnClickListener {
             RoomBackup()
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
-                .enableLogDebug(true)
-                .apply {
-                    onCompleteListener { success, _ ->
-                        if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
-                    }
-
-                }
-                .restore()
-        }
-
-        btn_backup_extern.setOnClickListener {
-            RoomBackup()
-                .context(this)
-                .database(FruitDatabase.getInstance(this))
-                .enableLogDebug(true)
-                .exportToExternalStorage(true)
-                .apply {
-                    onCompleteListener { success, _ ->
-                        if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
-                    }
-                }
-                .backup()
-
-
-        }
-        btn_restore_extern.setOnClickListener {
-            RoomBackup()
-                .context(this)
-                .database(FruitDatabase.getInstance(this))
-                .enableLogDebug(true)
-                .importFromExternalStorage(true)
+                .enableLogDebug(enableLog)
+                .fileIsEncrypted(encryptBackup)
+                .importFromExternalStorage(useExternalStorage)
                 .apply {
                     onCompleteListener { success, _ ->
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))

@@ -5,8 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.Fruit
-import com.ebner.roomdatabasebackup.sample.database.table.Fruit.FruitDao
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.Fruit
+import com.ebner.roomdatabasebackup.sample.database.table.fruit.FruitDao
 import java.util.concurrent.Executors
 
 /**
