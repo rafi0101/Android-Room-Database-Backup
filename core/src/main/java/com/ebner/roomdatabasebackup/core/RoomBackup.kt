@@ -430,8 +430,21 @@ class RoomBackup {
             Paths.get("$INTERNAL_BACKUP_PATH/$filename")
         }
 
-        if (fileIsEncrypted) decryptBackupFile(backuppath)
-        else {
+        val fileExtension = File(backuppath.toUri()).extension
+        if (fileIsEncrypted) {
+
+            if (fileExtension == "sqlite3") {
+                //Copy back database and replace current database, if file is not encrypted
+                Files.copy(backuppath, DATABASE_FILE, StandardCopyOption.REPLACE_EXISTING)
+                if (enableLogDebug) Log.d(TAG, "File is not encrypted, trying to restore")
+                if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
+                onCompleteListener?.onComplete(true, "success")
+            } else decryptBackupFile(backuppath)
+        } else {
+            if (fileExtension == "aes") {
+                if (enableLogDebug) Log.d(TAG, "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)")
+                onCompleteListener?.onComplete(false, "cannot restore database, see more details in Log (if enabled)")
+            }
             //Copy back database and replace current database
             Files.copy(backuppath, DATABASE_FILE, StandardCopyOption.REPLACE_EXISTING)
             if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
