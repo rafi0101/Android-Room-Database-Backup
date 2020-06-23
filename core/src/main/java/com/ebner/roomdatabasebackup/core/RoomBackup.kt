@@ -199,12 +199,12 @@ class RoomBackup {
         if (context == null) {
             if (enableLogDebug) Log.d(TAG, "context is missing")
             onCompleteListener?.onComplete(false, "context is missing")
-            return false
+            throw IllegalArgumentException("context is not initialized")
         }
         if (roomDatabase == null) {
             if (enableLogDebug) Log.d(TAG, "roomDatabase is missing")
             onCompleteListener?.onComplete(false, "roomDatabase is missing")
-            return false
+            throw IllegalArgumentException("roomDatabase is not initialized")
         }
 
         //Create or retrieve the Master Key for encryption/decryption
@@ -317,6 +317,7 @@ class RoomBackup {
         } catch (e: Exception) {
             if (enableLogDebug) Log.d(TAG, "error during encryption: ${e.message}")
             onCompleteListener?.onComplete(false, "error during encryption")
+            throw Exception("error during encryption: $e")
         }
     }
 
@@ -348,6 +349,7 @@ class RoomBackup {
         } catch (e: Exception) {
             if (enableLogDebug) Log.d(TAG, "error during decryption: ${e.message}")
             onCompleteListener?.onComplete(false, "error during decryption")
+            throw Exception("error during decryption: $e")
         }
 
     }
@@ -444,6 +446,7 @@ class RoomBackup {
             if (fileExtension == "aes") {
                 if (enableLogDebug) Log.d(TAG, "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)")
                 onCompleteListener?.onComplete(false, "cannot restore database, see more details in Log (if enabled)")
+                throw Exception("You are trying to restore an encrypted Database, but you did not add the property .fileIsEncrypted(true)")
             }
             //Copy back database and replace current database
             Files.copy(backuppath, DATABASE_FILE, StandardCopyOption.REPLACE_EXISTING)
