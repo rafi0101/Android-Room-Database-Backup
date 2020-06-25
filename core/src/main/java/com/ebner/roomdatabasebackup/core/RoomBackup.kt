@@ -58,9 +58,8 @@ class RoomBackup {
     private var onCompleteListener: OnCompleteListener? = null
     private var customRestoreDialogTitle: String = "Choose file to restore"
     private var customBackupFileName: String? = null
-    private var exportToExternalStorage: Boolean = false
-    private var importFromExternalStorage: Boolean = false
-    private var fileIsEncrypted: Boolean = false
+    private var useExternalStorage: Boolean = false
+    private var backupIsEncrypted: Boolean = false
 
     /**
      * Set Context
@@ -158,25 +157,14 @@ class RoomBackup {
     }
 
     /**
-     * Set export To External Storage enabled / disabled, if you want to export the backup to external storage
+     * Set export / import to External Storage enabled / disabled, if you want to export / import the backup to / from external storage
      * then you have access to the backup and can save it somewhere else
      *
      *
-     * @param exportToExternalStorage Boolean, default = false
+     * @param useExternalStorage Boolean, default = false
      */
-    fun exportToExternalStorage(exportToExternalStorage: Boolean): RoomBackup {
-        this.exportToExternalStorage = exportToExternalStorage
-        return this
-    }
-
-    /**
-     * Set import From External Storage enabled / disabled, if you want to restore the backup from external storage
-     *
-     *
-     * @param importFromExternalStorage Boolean, default = false
-     */
-    fun importFromExternalStorage(importFromExternalStorage: Boolean): RoomBackup {
-        this.importFromExternalStorage = importFromExternalStorage
+    fun useExternalStorage(useExternalStorage: Boolean): RoomBackup {
+        this.useExternalStorage = useExternalStorage
         return this
     }
 
@@ -185,10 +173,10 @@ class RoomBackup {
      * can be used for backup and restore
      *
      *
-     * @param fileIsEncrypted Boolean, default = false
+     * @param backupIsEncrypted Boolean, default = false
      */
-    fun fileIsEncrypted(fileIsEncrypted: Boolean): RoomBackup {
-        this.fileIsEncrypted = fileIsEncrypted
+    fun backupIsEncrypted(backupIsEncrypted: Boolean): RoomBackup {
+        this.backupIsEncrypted = backupIsEncrypted
         return this
     }
 
@@ -272,12 +260,12 @@ class RoomBackup {
         //Create name for backup file, if no custom name is set: Database name + currentTime + .sqlite3
         var filename = if (customBackupFileName == null) "$dbName-${getTime()}.sqlite3" else customBackupFileName as String
         //Add .aes extension to filename, if file is encrypted
-        if (fileIsEncrypted) filename += ".aes"
+        if (backupIsEncrypted) filename += ".aes"
 
         //Path to save current database
-        val backuppath = if (exportToExternalStorage) Paths.get("$EXTERNAL_BACKUP_PATH/$filename") else Paths.get("$INTERNAL_BACKUP_PATH/$filename")
+        val backuppath = if (useExternalStorage) Paths.get("$EXTERNAL_BACKUP_PATH/$filename") else Paths.get("$INTERNAL_BACKUP_PATH/$filename")
 
-        if (fileIsEncrypted) encryptBackupFile(backuppath)
+        if (backupIsEncrypted) encryptBackupFile(backuppath)
         else {
             //Copy current database to save location (/files dir)
             Files.copy(DATABASE_FILE, backuppath, StandardCopyOption.REPLACE_EXISTING)
@@ -378,7 +366,7 @@ class RoomBackup {
         if (!success) return
 
         //Path of Backup Directory
-        val backupDirectory = if (importFromExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else File(INTERNAL_BACKUP_PATH.toUri())
+        val backupDirectory = if (useExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else File(INTERNAL_BACKUP_PATH.toUri())
 
         //All Files in an Array of type File
         val arrayOfFiles = backupDirectory.listFiles()
@@ -426,14 +414,14 @@ class RoomBackup {
         //Close the database
         roomDatabase!!.close()
 
-        val backuppath = if (importFromExternalStorage) {
+        val backuppath = if (useExternalStorage) {
             Paths.get("$EXTERNAL_BACKUP_PATH/$filename")
         } else {
             Paths.get("$INTERNAL_BACKUP_PATH/$filename")
         }
 
         val fileExtension = File(backuppath.toUri()).extension
-        if (fileIsEncrypted) {
+        if (backupIsEncrypted) {
 
             if (fileExtension == "sqlite3") {
                 //Copy back database and replace current database, if file is not encrypted

@@ -140,8 +140,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
-                .fileIsEncrypted(encryptBackup)
-                .exportToExternalStorage(useExternalStorage)
+                .backupIsEncrypted(encryptBackup)
+                .useExternalStorage(useExternalStorage)
                 .apply {
                     onCompleteListener { success, _ ->
                         Log.d(TAG, "restarting app...")
@@ -157,8 +157,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .context(this)
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
-                .fileIsEncrypted(encryptBackup)
-                .importFromExternalStorage(useExternalStorage)
+                .backupIsEncrypted(encryptBackup)
+                .useExternalStorage(useExternalStorage)
                 .apply {
                     onCompleteListener { success, _ ->
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
