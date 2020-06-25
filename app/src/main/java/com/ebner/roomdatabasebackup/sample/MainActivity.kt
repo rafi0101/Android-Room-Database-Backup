@@ -143,8 +143,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .backupIsEncrypted(encryptBackup)
                 .useExternalStorage(useExternalStorage)
                 .apply {
-                    onCompleteListener { success, _ ->
-                        Log.d(TAG, "restarting app...")
+                    onCompleteListener { success, message ->
+                        Log.d(TAG, "success: $success, message: $message")
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
                 }
@@ -160,7 +160,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .backupIsEncrypted(encryptBackup)
                 .useExternalStorage(useExternalStorage)
                 .apply {
-                    onCompleteListener { success, _ ->
+                    onCompleteListener { success, message ->
+                        Log.d(TAG, "success: $success, message: $message")
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
 
