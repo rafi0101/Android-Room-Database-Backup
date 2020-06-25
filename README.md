@@ -62,12 +62,17 @@ implementation 'com.github.rafi0101:Android-Room-Database-Backup:0.1.4'
 
 **Required**
 
-```kotlin
-.context(this)
-```
-```kotlin
-.database(*YourDatabase*.getInstance(this))
-```
+  * Current context
+  
+    ```kotlin
+    .context(this)
+    ```
+    
+  * Instance of your room database
+  
+    ```kotlin
+    .database(*YourDatabase*.getInstance(this))
+    ```
 
 e.g. [`YourDatabase.kt`](app/src/main/java/com/ebner/roomdatabasebackup/sample/database/main/FruitDatabase.kt)
 
