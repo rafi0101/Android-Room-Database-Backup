@@ -1,4 +1,4 @@
-# Android-Room-Database-Backup
+# Android-Room-Database-Backup (WIP)
 
 
 [![](https://jitpack.io/v/rafi0101/Android-Room-Database-Backup.svg)](https://jitpack.io/#rafi0101/Android-Room-Database-Backup)
@@ -63,13 +63,15 @@ implementation 'com.github.rafi0101:Android-Room-Database-Backup:0.1.4'
 **Required**
 
   * Current context
-  
+
+
     ```kotlin
     .context(this)
     ```
     
   * Instance of your room database
-  
+
+
     ```kotlin
     .database(*YourDatabase*.getInstance(this))
     ```
@@ -81,15 +83,27 @@ e.g. [`YourDatabase.kt`](app/src/main/java/com/ebner/roomdatabasebackup/sample/d
 The following options are optional and the default options
 
   * Enable logging, for debugging and some error messages
-    
+
+   
     ```kotlin
     .enableLogDebug(false)
     ```
     
   * Set custom log tag
+ 
     
     ```kotlin
     .customLogTag("debug_RoomBackup")
+    ```   
+     
+  * Enable and set maxFileCount
+      * if file count of Backups > maxFileCount all old / the oldest backup file will be deleted
+      * can be used with internal and external storage
+      * default: infinity
+
+
+    ```kotlin
+    .maxFileCount(5)
     ```
     
   * Encrypt your backup
@@ -128,6 +142,7 @@ The following options are optional and the default options
     **Attention**\
     If a backup file with the same name already exists, it will be replaced
     
+
     ```kotlin
     .customBackupFileName(*DatabaseName* + *currentTime* + ".sqlite3")
     ```
@@ -166,6 +181,7 @@ The following options are optional and the default options
             .enableLogDebug(true)
             .backupIsEncrypted(true)
             .useExternalStorage(false)
+            .maxFileCount(5)
             .apply {
                 onCompleteListener { success, message ->
                     Log.d(TAG, "success: $success, message: $message")
@@ -205,6 +221,7 @@ The following options are optional and the default options
     roomBackup.enableLogDebug(enableLog);
     roomBackup.backupIsEncrypted(encryptBackup);
     roomBackup.useExternalStorage(useExternalStorage);
+    roomBackup.maxFileCount(5);
     roomBackup.onCompleteListener(new OnCompleteListener() {
         @Override
         public void onComplete(boolean success, @NotNull String message) {
