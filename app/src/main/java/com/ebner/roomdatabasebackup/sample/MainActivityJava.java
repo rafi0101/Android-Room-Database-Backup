@@ -59,6 +59,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
     private boolean encryptBackup;
     private boolean useExternalStorage;
     private boolean enableLog;
+    private boolean useMaxFileCount;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -97,6 +98,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         final String spEncryptBackup = "encryptBackup";
         final String spUseExternalStorage = "useExternalStorage";
         final String spEnableLog = "enableLog";
+        final String spUseMaxFileCount = "useMaxFileCount";
         final SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
         /*---------------------FAB Add Button--------------------------*/
@@ -123,9 +125,10 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         encryptBackup = sharedPreferences.getBoolean(spEncryptBackup, true);
         useExternalStorage = sharedPreferences.getBoolean(spUseExternalStorage, false);
         enableLog = sharedPreferences.getBoolean(spEnableLog, true);
+        useMaxFileCount = sharedPreferences.getBoolean(spUseMaxFileCount, false);
 
-        final String[] multiItems = new String[]{"Encrypt Backup", "use External Storage", "enable Log"};
-        final boolean[] checkedItems = new boolean[]{encryptBackup, useExternalStorage, enableLog};
+        final String[] multiItems = new String[]{"Encrypt Backup", "use External Storage", "enable Log", "use maxFileCount = 5"};
+        final boolean[] checkedItems = new boolean[]{encryptBackup, useExternalStorage, enableLog, useMaxFileCount};
 
         /*---------------------set Properties--------------------------*/
         btn_properties.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +156,10 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                                 enableLog = isChecked;
                                 sharedPreferences.edit().putBoolean(spEnableLog, enableLog).apply();
                                 break;
+                            case 3:
+                                useMaxFileCount = isChecked;
+                                sharedPreferences.edit().putBoolean(spUseMaxFileCount, useMaxFileCount).apply();
+                                break;
                             default:
                         }
                     }
@@ -174,6 +181,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                 roomBackup.enableLogDebug(enableLog);
                 roomBackup.backupIsEncrypted(encryptBackup);
                 roomBackup.useExternalStorage(useExternalStorage);
+                if (useMaxFileCount) roomBackup.maxFileCount(5);
                 roomBackup.onCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(boolean success, @NotNull String message) {

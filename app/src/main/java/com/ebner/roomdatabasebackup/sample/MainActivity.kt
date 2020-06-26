@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         val spEncryptBackup = "encryptBackup"
         val spUseExternalStorage = "useExternalStorage"
         val spEnableLog = "enableLog"
+        val spUseMaxFileCount = "useMaxFileCount"
         val sharedPreferences = getSharedPreferences(sharedPrefs, Context.MODE_PRIVATE)
 
         /*---------------------FAB Add Button--------------------------*/
@@ -103,12 +104,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         var encryptBackup = sharedPreferences.getBoolean(spEncryptBackup, true)
         var useExternalStorage = sharedPreferences.getBoolean(spUseExternalStorage, false)
         var enableLog = sharedPreferences.getBoolean(spEnableLog, true)
+        var useMaxFileCount = sharedPreferences.getBoolean(spUseMaxFileCount, false)
 
 
         /*---------------------set Properties--------------------------*/
         btnProperties.setOnClickListener {
-            val multiItems = arrayOf("Encrypt Backup", "use External Storage", "enable Log")
-            val checkedItems = booleanArrayOf(encryptBackup, useExternalStorage, enableLog)
+            val multiItems = arrayOf("Encrypt Backup", "use External Storage", "enable Log", "use maxFileCount = 5")
+            val checkedItems = booleanArrayOf(encryptBackup, useExternalStorage, enableLog, useMaxFileCount)
 
             MaterialAlertDialogBuilder(this)
                 .setTitle("Change Properties")
@@ -116,8 +118,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 //Multi-choice items (initialized with checked items)
                 .setMultiChoiceItems(multiItems, checkedItems) { _, which, checked ->
                     // Respond to item chosen
-                    when(which){
-                        0 ->  {
+                    when (which) {
+                        0 -> {
                             encryptBackup = checked
                             sharedPreferences.edit().putBoolean(spEncryptBackup, encryptBackup).apply()
                         }
@@ -128,6 +130,10 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                         2 -> {
                             enableLog = checked
                             sharedPreferences.edit().putBoolean(spEnableLog, enableLog).apply()
+                        }
+                        3 -> {
+                            useMaxFileCount = checked
+                            sharedPreferences.edit().putBoolean(spUseMaxFileCount, useMaxFileCount).apply()
                         }
                     }
                 }
@@ -142,6 +148,8 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .enableLogDebug(enableLog)
                 .backupIsEncrypted(encryptBackup)
                 .useExternalStorage(useExternalStorage)
+                //maxFileCount: else 1000 because i cannot surround it with if condition
+                .maxFileCount(if (useMaxFileCount) 5 else 1000)
                 .apply {
                     onCompleteListener { success, message ->
                         Log.d(TAG, "success: $success, message: $message")
