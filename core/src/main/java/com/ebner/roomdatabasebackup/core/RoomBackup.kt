@@ -60,6 +60,7 @@ class RoomBackup {
     private var customBackupFileName: String? = null
     private var useExternalStorage: Boolean = false
     private var backupIsEncrypted: Boolean = false
+    private var maxFileCount: Int? = null
 
     /**
      * Set Context
@@ -181,6 +182,19 @@ class RoomBackup {
     }
 
     /**
+     * Set max backup files count
+     * if fileCount is > maxFileCount the oldest backup file will be deleted
+     * is for both internal and external storage
+     *
+     *
+     * @param maxFileCount Int, default = null
+     */
+    fun maxFileCount(maxFileCount: Int): RoomBackup {
+        this.maxFileCount = maxFileCount
+        return this
+    }
+
+    /**
      * Init vars, and return true if no error occurred
      */
     private fun initRoomBackup(): Boolean {
@@ -271,6 +285,13 @@ class RoomBackup {
             Files.copy(DATABASE_FILE, backuppath, StandardCopyOption.REPLACE_EXISTING)
 
             if (enableLogDebug) Log.d(TAG, "Saved to: $backuppath")
+
+            //If maxFileCount is set and is reached, delete oldest file
+            if (maxFileCount != null) {
+                val deleted = deleteOldBackup()
+                if (!deleted) return
+            }
+
             onCompleteListener?.onComplete(true, "success")
         }
     }
@@ -298,8 +319,14 @@ class RoomBackup {
             //Delete temp file
             Files.delete(TEMP_BACKUP_FILE)
 
-
             if (enableLogDebug) Log.d(TAG, "Saved and encrypted to: $backuppath")
+
+            //If maxFileCount is set and is reached, delete oldest file
+            if (maxFileCount != null) {
+                val deleted = deleteOldBackup()
+                if (!deleted) return
+            }
+
             onCompleteListener?.onComplete(true, "saved and encrypted")
 
         } catch (e: Exception) {
@@ -353,6 +380,40 @@ class RoomBackup {
 
         return currentTime.format(formatter)
 
+    }
+
+    /**
+     * If maxFileCount is set, and reached, all old files will be deleted
+     *
+     * @return true if old files deleted or nothing to do
+     */
+    private fun deleteOldBackup(): Boolean {
+        //Path of Backup Directory
+        val backupDirectory = if (useExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else File(INTERNAL_BACKUP_PATH.toUri())
+
+        //All Files in an Array of type File
+        val arrayOfFiles = backupDirectory.listFiles()
+
+        //If array is null or empty nothing to do and return
+        if (arrayOfFiles.isNullOrEmpty()) {
+            if (enableLogDebug) Log.d(TAG, "")
+            onCompleteListener?.onComplete(false, "maxFileCount: Failed to get list of backups")
+            return false
+        } else if (arrayOfFiles.size > maxFileCount!!) {
+            //Sort Array: lastModified
+            Arrays.sort(arrayOfFiles, Comparator.comparingLong { obj: File -> obj.lastModified() })
+
+            //Get count of files to delete
+            val fileCountToDelete = arrayOfFiles.size - maxFileCount!!
+
+            for (i in 1..fileCountToDelete) {
+                //Delete all old files (i-1 because array starts a 0)
+                Files.delete(arrayOfFiles[i - 1].toPath())
+
+                if (enableLogDebug) Log.d(TAG, "maxFileCount reached: ${arrayOfFiles[i - 1]} deleted")
+            }
+        }
+        return true
     }
 
     /**
