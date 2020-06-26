@@ -1,4 +1,4 @@
-# Android-Room-Database-Backup (WIP)
+# Android-Room-Database-Backup
 
 
 [![](https://jitpack.io/v/rafi0101/Android-Room-Database-Backup.svg)](https://jitpack.io/#rafi0101/Android-Room-Database-Backup)
@@ -48,7 +48,7 @@ allprojects {
 Then, add the dependency for `Android-Room-Database-Backup ` to your project-level `build.gradle` file.
 
 ```groovy
-implementation 'com.github.rafi0101:Android-Room-Database-Backup:0.1.4'
+implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta01'
 ```
 
  Usage
