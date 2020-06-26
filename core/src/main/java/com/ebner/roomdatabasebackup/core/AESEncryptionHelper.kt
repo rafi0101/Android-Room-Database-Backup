@@ -2,7 +2,6 @@ package com.ebner.roomdatabasebackup.core
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.util.Log
 import java.io.*
 import java.nio.file.Path
 import java.security.NoSuchAlgorithmException
@@ -74,8 +73,6 @@ class AESEncryptionHelper {
      */
     @SuppressLint("ApplySharedPref")
     fun getSecretKey(sharedPref: SharedPreferences, iv: ByteArray): SecretKey {
-
-        Log.d(TAG, "sharedprefs helper: $sharedPref")
 
         //get key: String from sharedpref
         var password = sharedPref.getString(BACKUP_SECRET_KEY, null)
