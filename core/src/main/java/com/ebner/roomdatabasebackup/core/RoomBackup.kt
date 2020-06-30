@@ -462,6 +462,10 @@ class RoomBackup {
             .setItems(filesStringArray) { _, which ->
                 restoreSelectedFile(filesStringArray[which])
             }
+            .setOnCancelListener{
+                if (enableLogDebug) Log.d(TAG, "Restore dialog canceled")
+                onCompleteListener?.onComplete(false, "Restore dialog canceled")
+            }
             .show()
     }
 
