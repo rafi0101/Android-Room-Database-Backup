@@ -48,7 +48,7 @@ allprojects {
 Then, add the dependency for `Android-Room-Database-Backup ` to your project-level `build.gradle` file.
 
 ```groovy
-implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta02'
+implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta04'
 ```
 
  Usage
@@ -116,6 +116,20 @@ The following options are optional and the default options
     ```kotlin
     .backupIsEncrypted(false)
     ```
+    
+  * Encrypt your backup with your own password / key
+      * This property is only working, if ```.backupIsEncrypted(true)``` is set
+      * If you use the key to encrypt the backup, you will also need it to decrypt
+      * Example: If you want to create an encrypted backup, export it and import it to another device. Then you need a custom key, else the backup is encrypted with a random key, and you can not decrypt it on a new device
+      
+      **Attention**\
+      i do not assume any liability for the loss of your key
+      
+      
+    ```kotlin
+    .customEncryptPassword("YOUR_SECRET_PASSWORD")
+    ```
+    
     
   * Save your backup to external app storage
       * External
