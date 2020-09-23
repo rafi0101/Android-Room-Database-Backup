@@ -180,6 +180,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                 roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
                 roomBackup.enableLogDebug(enableLog);
                 roomBackup.backupIsEncrypted(encryptBackup);
+                roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
                 roomBackup.useExternalStorage(useExternalStorage);
                 if (useMaxFileCount) roomBackup.maxFileCount(5);
                 roomBackup.onCompleteListener(new OnCompleteListener() {
@@ -202,6 +203,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                 roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
                 roomBackup.enableLogDebug(enableLog);
                 roomBackup.backupIsEncrypted(encryptBackup);
+                roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
                 roomBackup.useExternalStorage(useExternalStorage);
                 roomBackup.onCompleteListener(new OnCompleteListener() {
                     @Override

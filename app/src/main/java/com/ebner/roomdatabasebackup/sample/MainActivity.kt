@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
@@ -51,6 +52,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         private const val ADD_FRUIT_REQUEST = 1
         private const val EDIT_FRUIT_REQUEST = 2
         private const val TAG = "debug_MainActivity"
+        const val SECRET_PASSWORD = "verySecretEncryptionKey"
     }
 
     @SuppressLint("SetTextI18n")
@@ -147,12 +149,14 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
                 .backupIsEncrypted(encryptBackup)
+                .customEncryptPassword(SECRET_PASSWORD)
                 .useExternalStorage(useExternalStorage)
                 //maxFileCount: else 1000 because i cannot surround it with if condition
                 .maxFileCount(if (useMaxFileCount) 5 else 1000)
                 .apply {
                     onCompleteListener { success, message ->
                         Log.d(TAG, "success: $success, message: $message")
+                        Toast.makeText(this@MainActivity, "success: $success, message: $message", Toast.LENGTH_LONG).show()
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
                 }
@@ -166,10 +170,12 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
                 .backupIsEncrypted(encryptBackup)
+                .customEncryptPassword(SECRET_PASSWORD)
                 .useExternalStorage(useExternalStorage)
                 .apply {
                     onCompleteListener { success, message ->
                         Log.d(TAG, "success: $success, message: $message")
+                        Toast.makeText(this@MainActivity, "success: $success, message: $message", Toast.LENGTH_LONG).show()
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
 
