@@ -66,8 +66,8 @@ class AESEncryptionHelper {
     }
 
     /**
-     * This method will convert a file to ByteArray
-     * @param sharedPref : the sharedPref, to fetch the key
+     * This method will convert a random password, saved in sharedPreferences to a SecretKey
+     * @param sharedPref : the sharedPref, to fetch / save the key
      * @param iv : the encryption nonce
      * @return SecretKey
      */
@@ -98,6 +98,17 @@ class AESEncryptionHelper {
 
         //generate secretKey, and return it
         return generateSecretKey(password, iv)
+    }
+
+    /**
+     * This method will convert a custom password to a SecretKey
+     * @param encryptPassword : the custom user password as String
+     * @param iv : the encryption nonce
+     * @return SecretKey
+     */
+    fun getSecretKeyWithCustomPw(encryptPassword: String, iv: ByteArray): SecretKey {
+        //generate secretKey, and return it
+        return generateSecretKey(encryptPassword, iv)
     }
 
     /**

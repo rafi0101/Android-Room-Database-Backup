@@ -37,7 +37,7 @@ class AESEncryptionManager {
         IllegalBlockSizeException::class,
         InvalidKeySpecException::class
     )
-    fun encryptData(sharedPref: SharedPreferences, data: ByteArray): ByteArray {
+    fun encryptData(sharedPref: SharedPreferences, encryptPassword: String?, data: ByteArray): ByteArray {
 
         //Prepare the nonce
         val secureRandom = SecureRandom()
@@ -47,7 +47,9 @@ class AESEncryptionManager {
         secureRandom.nextBytes(iv)
 
         //Prepare your key/password
-        val secretKey = aesEncryptionHelper.getSecretKey(sharedPref, iv)
+        val secretKey = if (encryptPassword != null) { aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
+        } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
+
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         val parameterSpec = GCMParameterSpec(128, iv)
 
@@ -80,7 +82,7 @@ class AESEncryptionManager {
         IllegalBlockSizeException::class,
         InvalidKeySpecException::class
     )
-    fun decryptData(sharedPref: SharedPreferences, encryptedData: ByteArray): ByteArray {
+    fun decryptData(sharedPref: SharedPreferences, encryptPassword: String?, encryptedData: ByteArray): ByteArray {
 
 
         //Wrap the data into a byte buffer to ease the reading process
@@ -93,7 +95,8 @@ class AESEncryptionManager {
         byteBuffer[iv]
 
         //Prepare your key/password
-        val secretKey = aesEncryptionHelper.getSecretKey(sharedPref, iv)
+        val secretKey = if (encryptPassword != null) { aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
+        } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
 
         //get the rest of encrypted data
         val cipherBytes = ByteArray(byteBuffer.remaining())
