@@ -457,7 +457,7 @@ class RoomBackup {
         val filesStringArray = mutableListOfFilesAsString.toTypedArray()
 
         //Show MaterialAlertDialog, with all available files, and on click Listener
-        MaterialAlertDialogBuilder(context)
+        MaterialAlertDialogBuilder(context!!)
             .setTitle(customRestoreDialogTitle)
             .setItems(filesStringArray) { _, which ->
                 restoreSelectedFile(filesStringArray[which])
