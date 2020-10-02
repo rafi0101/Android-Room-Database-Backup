@@ -194,6 +194,7 @@ The following options are optional and the default options
             .database(FruitDatabase.getInstance(this))
             .enableLogDebug(true)
             .backupIsEncrypted(true)
+            .customEncryptPassword("YOUR_SECRET_PASSWORD")
             .useExternalStorage(false)
             .maxFileCount(5)
             .apply {
@@ -213,6 +214,7 @@ The following options are optional and the default options
             .database(FruitDatabase.getInstance(this))
             .enableLogDebug(true)
             .backupIsEncrypted(true)
+            .customEncryptPassword("YOUR_SECRET_PASSWORD")
             .useExternalStorage(false)
             .apply {
                 onCompleteListener { success, message ->
