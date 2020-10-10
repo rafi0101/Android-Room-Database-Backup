@@ -45,7 +45,7 @@ allprojects {
 }
 ```
 
-Then, add the dependency for `Android-Room-Database-Backup ` to your project-level `build.gradle` file.
+Then, add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
 
 ```groovy
 implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta04'
