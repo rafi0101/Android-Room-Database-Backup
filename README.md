@@ -1,6 +1,7 @@
 # Android-Room-Database-Backup
 
 
+![Build](https://github.com/rafi0101/Android-Room-Database-Backup/workflows/Android%20CI/badge.svg)
 [![](https://jitpack.io/v/rafi0101/Android-Room-Database-Backup.svg)](https://jitpack.io/#rafi0101/Android-Room-Database-Backup)
 [![API](https://img.shields.io/badge/API-26%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=26)
 ![Language](https://img.shields.io/badge/language-Kotlin-orange.svg)
