@@ -247,7 +247,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
         /*---------------------If the Request was successful--------------------------*/
         if (resultCode == Activity.RESULT_OK) {
-            val name = data!!.getStringExtra(ActivityAddEditFruit.EXTRA_NAME)
+            val name = data!!.getStringExtra(ActivityAddEditFruit.EXTRA_NAME)!!
             val fruit = Fruit(name = name)
 
             /*---------------------If the Request was a ADD fruit request--------------------------*/
