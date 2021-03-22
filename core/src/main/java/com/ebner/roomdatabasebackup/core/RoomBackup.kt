@@ -389,7 +389,11 @@ class RoomBackup {
 
         val currentTime = Calendar.getInstance().time
 
-        val sdf = SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.getDefault())
+        val sdf = if (android.os.Build.VERSION.SDK_INT <= 28 && useExternalStorage) {
+            SimpleDateFormat("yyyy-MM-dd-HH_mm_ss", Locale.getDefault())
+        } else {
+            SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.getDefault())
+        }
 
         return sdf.format(currentTime)
 
