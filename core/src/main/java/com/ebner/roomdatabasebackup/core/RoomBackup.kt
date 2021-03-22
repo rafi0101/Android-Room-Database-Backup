@@ -9,17 +9,13 @@ import androidx.room.RoomDatabase
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.common.io.Files.copy
 import kotlinx.coroutines.runBlocking
+import org.apache.commons.io.comparator.LastModifiedFileComparator
 import java.io.File
 import java.io.IOException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.Comparator
 
 /**
  * Copyright 2020 Raphael Ebner
@@ -41,11 +37,11 @@ class RoomBackup {
     companion object {
         private const val SHARED_PREFS = "com.ebner.roomdatabasebackup"
         private var TAG = "debug_RoomBackup"
-        private lateinit var INTERNAL_BACKUP_PATH: Path
-        private lateinit var TEMP_BACKUP_PATH: Path
-        private lateinit var TEMP_BACKUP_FILE: Path
-        private lateinit var EXTERNAL_BACKUP_PATH: Path
-        private lateinit var DATABASE_FILE: Path
+        private lateinit var INTERNAL_BACKUP_PATH: File
+        private lateinit var TEMP_BACKUP_PATH: File
+        private lateinit var TEMP_BACKUP_FILE: File
+        private lateinit var EXTERNAL_BACKUP_PATH: File
+        private lateinit var DATABASE_FILE: File
     }
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -213,13 +209,13 @@ class RoomBackup {
         if (context == null) {
             if (enableLogDebug) Log.d(TAG, "context is missing")
             onCompleteListener?.onComplete(false, "context is missing")
-    //        throw IllegalArgumentException("context is not initialized")
+            //        throw IllegalArgumentException("context is not initialized")
             return false
         }
         if (roomDatabase == null) {
             if (enableLogDebug) Log.d(TAG, "roomDatabase is missing")
             onCompleteListener?.onComplete(false, "roomDatabase is missing")
-     //       throw IllegalArgumentException("roomDatabase is not initialized")
+            //       throw IllegalArgumentException("roomDatabase is not initialized")
             return false
         }
 
@@ -239,16 +235,16 @@ class RoomBackup {
         )
 
         dbName = roomDatabase!!.openHelper.databaseName
-        INTERNAL_BACKUP_PATH = Paths.get("${context!!.filesDir}/databasebackup/")
-        TEMP_BACKUP_PATH = Paths.get("${context!!.filesDir}/databasebackup-temp/")
-        TEMP_BACKUP_FILE = Paths.get("$TEMP_BACKUP_PATH/tempbackup.sqlite3")
-        EXTERNAL_BACKUP_PATH = Paths.get(context!!.getExternalFilesDir("backup")!!.toURI())
-        DATABASE_FILE = Paths.get(context!!.getDatabasePath(dbName).toURI())
+        INTERNAL_BACKUP_PATH = File("${context!!.filesDir}/databasebackup/")
+        TEMP_BACKUP_PATH = File("${context!!.filesDir}/databasebackup-temp/")
+        TEMP_BACKUP_FILE = File("$TEMP_BACKUP_PATH/tempbackup.sqlite3")
+        EXTERNAL_BACKUP_PATH = File(context!!.getExternalFilesDir("backup")!!.toURI())
+        DATABASE_FILE = File(context!!.getDatabasePath(dbName).toURI())
 
         //Create internal and temp backup directory if does not exist
         try {
-            Files.createDirectory(INTERNAL_BACKUP_PATH)
-            Files.createDirectory(TEMP_BACKUP_PATH)
+            INTERNAL_BACKUP_PATH.mkdirs()
+            TEMP_BACKUP_PATH.mkdirs()
         } catch (e: FileAlreadyExistsException) {
         } catch (e: IOException) {
         }
@@ -291,12 +287,12 @@ class RoomBackup {
         if (backupIsEncrypted) filename += ".aes"
 
         //Path to save current database
-        val backuppath = if (useExternalStorage) Paths.get("$EXTERNAL_BACKUP_PATH/$filename") else Paths.get("$INTERNAL_BACKUP_PATH/$filename")
+        val backuppath = if (useExternalStorage) File("$EXTERNAL_BACKUP_PATH/$filename") else File("$INTERNAL_BACKUP_PATH/$filename")
 
         if (backupIsEncrypted) encryptBackupFile(backuppath)
         else {
             //Copy current database to save location (/files dir)
-            Files.copy(DATABASE_FILE, backuppath, StandardCopyOption.REPLACE_EXISTING)
+            copy(DATABASE_FILE, backuppath)
 
             if (enableLogDebug) Log.d(TAG, "Saved to: $backuppath")
 
@@ -315,11 +311,12 @@ class RoomBackup {
      *
      * @param backuppath Path, where to save the backup (internal or external storage)
      */
-    private fun encryptBackupFile(backuppath: Path) {
+    private fun encryptBackupFile(backuppath: File) {
         try {
 
             //Copy database you want to backup to temp directory
-            Files.copy(DATABASE_FILE, TEMP_BACKUP_FILE, StandardCopyOption.REPLACE_EXISTING)
+            copy(DATABASE_FILE, TEMP_BACKUP_FILE)
+
 
             //encrypt temp file, and save it to backup location
             val encryptDecryptBackup = AESEncryptionHelper()
@@ -331,7 +328,7 @@ class RoomBackup {
             encryptDecryptBackup.saveFile(encryptedBytes, backuppath)
 
             //Delete temp file
-            Files.delete(TEMP_BACKUP_FILE)
+            TEMP_BACKUP_FILE.delete()
 
             if (enableLogDebug) Log.d(TAG, "Saved and encrypted to: $backuppath")
 
@@ -347,7 +344,7 @@ class RoomBackup {
             if (enableLogDebug) Log.d(TAG, "error during encryption: ${e.message}")
             onCompleteListener?.onComplete(false, "error during encryption")
             return
-        //    throw Exception("error during encryption: $e")
+            //    throw Exception("error during encryption: $e")
         }
     }
 
@@ -356,10 +353,10 @@ class RoomBackup {
      *
      * @param backuppath Path, where to find the backup to restore (internal or external storage)
      */
-    private fun decryptBackupFile(backuppath: Path) {
+    private fun decryptBackupFile(backuppath: File) {
         try {
             //Copy database you want to restore to temp directory
-            Files.copy(backuppath, TEMP_BACKUP_FILE, StandardCopyOption.REPLACE_EXISTING)
+            copy(backuppath, TEMP_BACKUP_FILE)
 
             //Decrypt temp file, and save it to database location
             val encryptDecryptBackup = AESEncryptionHelper()
@@ -371,7 +368,7 @@ class RoomBackup {
             encryptDecryptBackup.saveFile(decryptedBytes, DATABASE_FILE)
 
             //Delete tem file
-            Files.delete(TEMP_BACKUP_FILE)
+            TEMP_BACKUP_FILE.delete()
 
             if (enableLogDebug) Log.d(TAG, "restored and decrypted from / to $backuppath")
             onCompleteListener?.onComplete(true, "restored and decrypted")
@@ -380,7 +377,7 @@ class RoomBackup {
             if (enableLogDebug) Log.d(TAG, "error during decryption: ${e.message}")
             onCompleteListener?.onComplete(false, "error during decryption (maybe wrong password) see Log for more details (if enabled)")
             return
-         //   throw Exception("error during decryption: $e")
+            //   throw Exception("error during decryption: $e")
         }
 
     }
@@ -390,11 +387,11 @@ class RoomBackup {
      */
     private fun getTime(): String {
 
-        val currentTime = LocalDateTime.now()
+        val currentTime = Calendar.getInstance().time
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss")
+        val sdf = SimpleDateFormat("yyyy-MM-dd-HH:mm:ss", Locale.getDefault())
 
-        return currentTime.format(formatter)
+        return sdf.format(currentTime)
 
     }
 
@@ -405,7 +402,7 @@ class RoomBackup {
      */
     private fun deleteOldBackup(): Boolean {
         //Path of Backup Directory
-        val backupDirectory = if (useExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else File(INTERNAL_BACKUP_PATH.toUri())
+        val backupDirectory = if (useExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else INTERNAL_BACKUP_PATH
 
         //All Files in an Array of type File
         val arrayOfFiles = backupDirectory.listFiles()
@@ -417,14 +414,14 @@ class RoomBackup {
             return false
         } else if (arrayOfFiles.size > maxFileCount!!) {
             //Sort Array: lastModified
-            Arrays.sort(arrayOfFiles, Comparator.comparingLong { obj: File -> obj.lastModified() })
+            Arrays.sort(arrayOfFiles, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
 
             //Get count of files to delete
             val fileCountToDelete = arrayOfFiles.size - maxFileCount!!
 
             for (i in 1..fileCountToDelete) {
                 //Delete all old files (i-1 because array starts a 0)
-                Files.delete(arrayOfFiles[i - 1].toPath())
+                arrayOfFiles[i - 1].delete()
 
                 if (enableLogDebug) Log.d(TAG, "maxFileCount reached: ${arrayOfFiles[i - 1]} deleted")
             }
@@ -443,7 +440,7 @@ class RoomBackup {
         if (!success) return
 
         //Path of Backup Directory
-        val backupDirectory = if (useExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else File(INTERNAL_BACKUP_PATH.toUri())
+        val backupDirectory = if (useExternalStorage) File("$EXTERNAL_BACKUP_PATH/") else INTERNAL_BACKUP_PATH
 
         //All Files in an Array of type File
         val arrayOfFiles = backupDirectory.listFiles()
@@ -457,7 +454,7 @@ class RoomBackup {
         }
 
         //Sort Array: lastModified
-        Arrays.sort(arrayOfFiles, Comparator.comparingLong { obj: File -> obj.lastModified() })
+        Arrays.sort(arrayOfFiles, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
 
         //New empty MutableList of String
         val mutableListOfFilesAsString = mutableListOf<String>()
@@ -478,7 +475,7 @@ class RoomBackup {
             .setItems(filesStringArray) { _, which ->
                 restoreSelectedFile(filesStringArray[which])
             }
-            .setOnCancelListener{
+            .setOnCancelListener {
                 if (enableLogDebug) Log.d(TAG, "Restore dialog canceled")
                 onCompleteListener?.onComplete(false, "Restore dialog canceled")
             }
@@ -496,17 +493,18 @@ class RoomBackup {
         roomDatabase!!.close()
 
         val backuppath = if (useExternalStorage) {
-            Paths.get("$EXTERNAL_BACKUP_PATH/$filename")
+            File("$EXTERNAL_BACKUP_PATH/$filename")
         } else {
-            Paths.get("$INTERNAL_BACKUP_PATH/$filename")
+            File("$INTERNAL_BACKUP_PATH/$filename")
         }
 
-        val fileExtension = File(backuppath.toUri()).extension
+
+        val fileExtension = backuppath.extension
         if (backupIsEncrypted) {
 
             if (fileExtension == "sqlite3") {
                 //Copy back database and replace current database, if file is not encrypted
-                Files.copy(backuppath, DATABASE_FILE, StandardCopyOption.REPLACE_EXISTING)
+                copy(backuppath, DATABASE_FILE)
                 if (enableLogDebug) Log.d(TAG, "File is not encrypted, trying to restore")
                 if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
                 onCompleteListener?.onComplete(true, "success")
@@ -516,10 +514,10 @@ class RoomBackup {
                 if (enableLogDebug) Log.d(TAG, "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)")
                 onCompleteListener?.onComplete(false, "cannot restore database, see Log for more details (if enabled)")
                 return
-          //      throw Exception("You are trying to restore an encrypted Database, but you did not add the property .fileIsEncrypted(true)")
+                //      throw Exception("You are trying to restore an encrypted Database, but you did not add the property .fileIsEncrypted(true)")
             }
             //Copy back database and replace current database
-            Files.copy(backuppath, DATABASE_FILE, StandardCopyOption.REPLACE_EXISTING)
+            copy(backuppath, DATABASE_FILE)
             if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
             onCompleteListener?.onComplete(true, "success")
         }

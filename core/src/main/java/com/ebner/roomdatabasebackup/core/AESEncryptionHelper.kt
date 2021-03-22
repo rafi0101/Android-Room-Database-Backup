@@ -3,7 +3,6 @@ package com.ebner.roomdatabasebackup.core
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import java.io.*
-import java.nio.file.Path
 import java.security.NoSuchAlgorithmException
 import java.security.spec.InvalidKeySpecException
 import java.security.spec.KeySpec
@@ -36,12 +35,11 @@ class AESEncryptionHelper {
 
     /**
      * This method will convert a file to ByteArray
-     * @param filePath : the Path where the file is located
+     * @param file : the Path where the file is located
      * @return ByteArray of the file
      */
     @Throws(Exception::class)
-    fun readFile(filePath: Path): ByteArray {
-        val file = File(filePath.toUri())
+    fun readFile(file: File): ByteArray {
         val fileContents = file.readBytes()
         val inputBuffer = BufferedInputStream(
             FileInputStream(file)
@@ -54,11 +52,10 @@ class AESEncryptionHelper {
     /**
      * This method will convert a ByteArray to a file, and saves it to the path
      * @param fileData : the ByteArray
-     * @param path : the path where the ByteArray should be saved
+     * @param file : the path where the ByteArray should be saved
      */
     @Throws(Exception::class)
-    fun saveFile(fileData: ByteArray, path: Path) {
-        val file = File(path.toUri())
+    fun saveFile(fileData: ByteArray, file: File) {
         val bos = BufferedOutputStream(FileOutputStream(file, false))
         bos.write(fileData)
         bos.flush()
