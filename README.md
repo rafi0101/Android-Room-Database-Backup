@@ -3,7 +3,7 @@
 
 ![Build](https://github.com/rafi0101/Android-Room-Database-Backup/workflows/Android%20CI/badge.svg)
 [![](https://jitpack.io/v/rafi0101/Android-Room-Database-Backup.svg)](https://jitpack.io/#rafi0101/Android-Room-Database-Backup)
-[![API](https://img.shields.io/badge/API-26%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=26)
+[![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 ![Language](https://img.shields.io/badge/language-Kotlin-orange.svg)
 [![PRWelcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/rafi0101/Android-Room-Database-Backup/pulls)
 
@@ -49,7 +49,7 @@ allprojects {
 Then, add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
 
 ```groovy
-implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta04'
+implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta06'
 ```
 
  Usage
