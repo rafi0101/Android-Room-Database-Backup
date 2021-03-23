@@ -266,6 +266,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 /*---------------------If the Request was a EDIT fruit request--------------------------*/
             } else if (requestCode == EDIT_FRUIT_REQUEST && resultCode == Activity.RESULT_OK) {
                 val id = data.getIntExtra(ActivityAddEditFruit.EXTRA_ID, -1)
+                val deleteFruit = data.getBooleanExtra(ActivityAddEditFruit.EXTRA_DELETE_FRUIT, false)
 
                 if (id == -1) {
                     val snackbar = Snackbar
@@ -275,7 +276,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 }
 
                 fruit.id = id
-                fruitViewModel.update(fruit)
+                if (deleteFruit) fruitViewModel.delete(fruit) else fruitViewModel.update(fruit)
             }
         }
     }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.textfield.TextInputEditText
@@ -39,10 +40,13 @@ class ActivityAddEditFruit : AppCompatActivity() {
     companion object {
         const val EXTRA_ID = "com.ebner.roomdatabasebackup.sample.EXTRA_ID"
         const val EXTRA_NAME = "com.ebner.roomdatabasebackup.sample.EXTRA_NAME"
+        const val EXTRA_DELETE_FRUIT = "com.ebner.roomdatabasebackup.sample.EXTRA_DELETE_FRUIT"
     }
 
     private lateinit var tietFruit: TextInputEditText
     private lateinit var tilFruit: TextInputLayout
+    private lateinit var btnDelete: Button
+    private var deleteFruit = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +62,7 @@ class ActivityAddEditFruit : AppCompatActivity() {
         /*---------------------Link items to Layout--------------------------*/
         tietFruit = findViewById(R.id.tiet_fruit)
         tilFruit = findViewById(R.id.til_fruit)
+        btnDelete = findViewById(R.id.btn_delete)
 
         /*---------------------when calling this Activity, are some extras passed?--------------------------*/
         if (intent.hasExtra(EXTRA_NAME)) {
@@ -70,6 +75,16 @@ class ActivityAddEditFruit : AppCompatActivity() {
         //Remove the error message, if user starts typing
         tietFruit.addTextChangedListener {
             tilFruit.error = ""
+        }
+
+        //Delete Fruit
+        btnDelete.setOnClickListener {
+            if (intent.hasExtra(EXTRA_ID)) {
+                deleteFruit = true
+                saveFruit()
+            } else {
+                super.onBackPressed()
+            }
         }
 
     }
@@ -88,6 +103,7 @@ class ActivityAddEditFruit : AppCompatActivity() {
 
         val data = Intent()
         data.putExtra(EXTRA_NAME, tname)
+        data.putExtra(EXTRA_DELETE_FRUIT, deleteFruit)
         val id = intent.getIntExtra(EXTRA_ID, -1)
         if (id != -1) {
             data.putExtra(EXTRA_ID, id)

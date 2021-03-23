@@ -269,13 +269,14 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                 /*---------------------If the Request was a EDIT fruit request--------------------------*/
             } else if (requestCode == EDIT_FRUIT_REQUEST) {
                 int id = data.getIntExtra(ActivityAddEditFruit.EXTRA_ID, -1);
+                boolean deleteFruit = data.getBooleanExtra(ActivityAddEditFruit.EXTRA_DELETE_FRUIT, false);
 
                 if (id == -1) {
                     return;
                 }
 
                 fruit.setId(id);
-                fruitViewModel.update(fruit);
+                if (deleteFruit) fruitViewModel.delete(fruit); else fruitViewModel.update(fruit);
             }
         }
 
