@@ -9,9 +9,7 @@ import androidx.room.RoomDatabase
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.common.io.Files.copy
 import kotlinx.coroutines.runBlocking
-import org.apache.commons.io.comparator.LastModifiedFileComparator
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -300,7 +298,7 @@ class RoomBackup {
         if (backupIsEncrypted) encryptBackupFile(backuppath)
         else {
             //Copy current database to save location (/files dir)
-            copy(DATABASE_FILE, backuppath)
+            DATABASE_FILE.copyTo(backuppath, true)
 
             if (enableLogDebug) Log.d(TAG, "Saved to: $backuppath")
 
@@ -323,8 +321,7 @@ class RoomBackup {
         try {
 
             //Copy database you want to backup to temp directory
-            copy(DATABASE_FILE, TEMP_BACKUP_FILE)
-
+            DATABASE_FILE.copyTo(TEMP_BACKUP_FILE, true)
 
             //encrypt temp file, and save it to backup location
             val encryptDecryptBackup = AESEncryptionHelper()
@@ -364,7 +361,7 @@ class RoomBackup {
     private fun decryptBackupFile(backuppath: File) {
         try {
             //Copy database you want to restore to temp directory
-            copy(backuppath, TEMP_BACKUP_FILE)
+            backuppath.copyTo(TEMP_BACKUP_FILE, true)
 
             //Decrypt temp file, and save it to database location
             val encryptDecryptBackup = AESEncryptionHelper()
@@ -426,7 +423,7 @@ class RoomBackup {
             return false
         } else if (arrayOfFiles.size > maxFileCount!!) {
             //Sort Array: lastModified
-            Arrays.sort(arrayOfFiles, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
+            Arrays.sort(arrayOfFiles, Comparator.comparingLong(File::lastModified))
 
             //Get count of files to delete
             val fileCountToDelete = arrayOfFiles.size - maxFileCount!!
@@ -466,7 +463,7 @@ class RoomBackup {
         }
 
         //Sort Array: lastModified
-        Arrays.sort(arrayOfFiles, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR)
+        Arrays.sort(arrayOfFiles, Comparator.comparingLong(File::lastModified))
 
         //New empty MutableList of String
         val mutableListOfFilesAsString = mutableListOf<String>()
@@ -516,7 +513,7 @@ class RoomBackup {
 
             if (fileExtension == "sqlite3") {
                 //Copy back database and replace current database, if file is not encrypted
-                copy(backuppath, DATABASE_FILE)
+                backuppath.copyTo(DATABASE_FILE, true)
                 if (enableLogDebug) Log.d(TAG, "File is not encrypted, trying to restore")
                 if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
                 onCompleteListener?.onComplete(true, "success")
@@ -529,7 +526,7 @@ class RoomBackup {
                 //      throw Exception("You are trying to restore an encrypted Database, but you did not add the property .fileIsEncrypted(true)")
             }
             //Copy back database and replace current database
-            copy(backuppath, DATABASE_FILE)
+            backuppath.copyTo(DATABASE_FILE, true)
             if (enableLogDebug) Log.d(TAG, "Restored File: $backuppath")
             onCompleteListener?.onComplete(true, "success")
         }
