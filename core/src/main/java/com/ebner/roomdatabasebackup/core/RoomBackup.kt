@@ -287,7 +287,8 @@ class RoomBackup {
         if (!success) return
 
         //Close the database
-        roomDatabase!!.close()
+        // roomDatabase!!.close()
+        roomDatabase!!.query(SimpleSQLiteQuery("pragma wal_checkpoint(full)"))
 
         //Create name for backup file, if no custom name is set: Database name + currentTime + .sqlite3
         var filename = if (customBackupFileName == null) "$dbName-${getTime()}.sqlite3" else customBackupFileName as String
