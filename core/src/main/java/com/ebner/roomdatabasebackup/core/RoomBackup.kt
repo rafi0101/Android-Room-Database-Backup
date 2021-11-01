@@ -1,5 +1,6 @@
 package com.ebner.roomdatabasebackup.core
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -55,7 +56,7 @@ class RoomBackup {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var dbName: String
 
-    private var context: Context? = null
+    var context: Context? = null
     private var roomDatabase: RoomDatabase? = null
     private var enableLogDebug: Boolean = false
     private var restartIntent: Intent? = null
@@ -242,7 +243,7 @@ class RoomBackup {
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
 
-        dbName = roomDatabase!!.openHelper.databaseName
+        dbName = roomDatabase!!.openHelper.databaseName!!
         INTERNAL_BACKUP_PATH = File("${context!!.filesDir}/databasebackup/")
         TEMP_BACKUP_PATH = File("${context!!.filesDir}/databasebackup-temp/")
         TEMP_BACKUP_FILE = File("$TEMP_BACKUP_PATH/tempbackup.sqlite3")
@@ -273,9 +274,10 @@ class RoomBackup {
     private fun restartApp() {
         restartIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context!!.startActivity(restartIntent)
-        //   finish()
+        if (context is Activity) {
+            (context as Activity).finish()
+        }
         Runtime.getRuntime().exit(0)
-
     }
 
     /**
