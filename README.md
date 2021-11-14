@@ -32,6 +32,7 @@ Content
 * [Developed by](#Developed-by)
 * [License](#License)
 
+[Changelog](CHANGELOG.md)
 
  Getting started
 -----------
@@ -49,7 +50,7 @@ allprojects {
 Then, add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
 
 ```groovy
-implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta06'
+implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta07'
 ```
 
  Usage
@@ -63,11 +64,12 @@ implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta06'
 
 **Required**
 
-  * Current context
-
+  * Current context  
+  **Attention**  
+    Must be declared outside of an onClickListener before lifecycle state changes to started
 
     ```kotlin
-    .context(this)
+    RoomBackup(this)
     ```
     
   * Instance of your room database
@@ -123,7 +125,7 @@ The following options are optional and the default options
       * If you use the key to encrypt the backup, you will also need it to decrypt
       * Example: If you want to create an encrypted backup, export it and import it to another device. Then you need a custom key, else the backup is encrypted with a random key, and you can not decrypt it on a new device
       
-      **Attention**\
+      **Attention**  
       i do not assume any liability for the loss of your key
       
       
@@ -132,20 +134,26 @@ The following options are optional and the default options
     ```
     
     
-  * Save your backup to external app storage
+  * Save your backup to different storage
       * External
           * storage path: /storage/emulated/0/Android/data/*package*/files/backup/
-          * This files will be deleted, if you uninstall your app
+          * This files will be deleted, if you uninstall your app  
+          * ```RoomBackup.BACKUP_FILE_LOCATION_EXTERNAL```
       * Internal
           * Private, storage not accessible
-          * This files will be deleted, if you uninstall your app
-    
+          * This files will be deleted, if you uninstall your app  
+          * ```RoomBackup.BACKUP_FILE_LOCATION_INTERNAL```
+      * Custom
+          * You can choose to save or restore where ever you want. A CreateDocument() or OpenDocument() Activity will be launched where you can choose the location
+          * If your backup is encrypted I reccomend you using a custom encrption password else you can't restore your backup  
+          * ```RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG```
+
 
     ```kotlin
-    .useExternalStorage(false)
+    .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL)
     ```
     
-  * Set a custom dialog title, when showing list of available backups to restore
+  * Set a custom dialog title, when showing list of available backups to restore (only for external or internal storage)
     
     
     ```kotlin
@@ -190,13 +198,14 @@ The following options are optional and the default options
 * ##### Backup
 
     ```kotlin
-        RoomBackup()
-            .context(this)
+        val backup = RoomBackup(this)
+        ...
+        backup
             .database(FruitDatabase.getInstance(this))
             .enableLogDebug(true)
             .backupIsEncrypted(true)
             .customEncryptPassword("YOUR_SECRET_PASSWORD")
-            .useExternalStorage(false)
+            .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL)
             .maxFileCount(5)
             .apply {
                 onCompleteListener { success, message ->
@@ -210,13 +219,14 @@ The following options are optional and the default options
 * ##### Restore
     
     ```kotlin
-        RoomBackup()
-            .context(this)
+        val backup = RoomBackup(this)
+        ...
+        backup
             .database(FruitDatabase.getInstance(this))
             .enableLogDebug(true)
             .backupIsEncrypted(true)
             .customEncryptPassword("YOUR_SECRET_PASSWORD")
-            .useExternalStorage(false)
+            .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL)
             .apply {
                 onCompleteListener { success, message ->
                     Log.d(TAG, "success: $success, message: $message")
@@ -232,19 +242,16 @@ The following options are optional and the default options
 * ##### Backup
     
     ```java
-    final RoomBackup roomBackup = new RoomBackup();
-    roomBackup.context(MainActivityJava.this);
+    final RoomBackup roomBackup = new RoomBackup(MainActivityJava.this);
+    ...
     roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
     roomBackup.enableLogDebug(enableLog);
     roomBackup.backupIsEncrypted(encryptBackup);
-    roomBackup.useExternalStorage(useExternalStorage);
+    roomBackup.backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL);
     roomBackup.maxFileCount(5);
-    roomBackup.onCompleteListener(new OnCompleteListener() {
-        @Override
-        public void onComplete(boolean success, @NotNull String message) {
-            Log.d(TAG, "success: " + success + ", message: " + message);
-            if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
-        }
+    roomBackup.onCompleteListener((success, message) -> {
+        Log.d(TAG, "success: " + success + ", message: " + message);
+        if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
     });
     roomBackup.backup();
     ```
@@ -252,18 +259,15 @@ The following options are optional and the default options
 * ##### Restore
     
     ```java
-    final RoomBackup roomBackup = new RoomBackup();
-    roomBackup.context(MainActivityJava.this);
+    final RoomBackup roomBackup = new RoomBackup(MainActivityJava.this);
+    ...
     roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
     roomBackup.enableLogDebug(enableLog);
     roomBackup.backupIsEncrypted(encryptBackup);
-    roomBackup.useExternalStorage(useExternalStorage);
-    roomBackup.onCompleteListener(new OnCompleteListener() {
-        @Override
-        public void onComplete(boolean success, @NotNull String message) {
-            Log.d(TAG, "success: " + success + ", message: " + message);
-            if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
-        }
+    roomBackup.backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL);
+    roomBackup.onCompleteListener((success, message) -> {
+        Log.d(TAG, "success: " + success + ", message: " + message);
+        if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
     });
     roomBackup.restore();
     ```
