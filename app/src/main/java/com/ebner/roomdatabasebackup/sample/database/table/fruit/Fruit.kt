@@ -36,4 +36,8 @@ data class Fruit(
 
     @ColumnInfo(name = "name")
     var name: String
-)
+) {
+    constructor(name: String) : this(0, name) {
+        this.name = name
+    }
+}

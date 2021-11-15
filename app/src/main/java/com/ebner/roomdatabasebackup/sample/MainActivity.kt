@@ -11,10 +11,10 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +27,7 @@ import com.ebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 
 
 /**
@@ -58,8 +59,6 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
     private lateinit var clMain: CoordinatorLayout
 
     companion object {
-        private const val ADD_FRUIT_REQUEST = 1
-        private const val EDIT_FRUIT_REQUEST = 2
         private const val TAG = "debug_MainActivity"
         const val SECRET_PASSWORD = "verySecretEncryptionKey"
     }
@@ -77,15 +76,16 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         val btnRestore: Button = findViewById(R.id.btn_restore)
         val btnProperties: Button = findViewById(R.id.btn_properties)
         val btnLanguage: Button = findViewById(R.id.btn_switch_language)
+        val btnBackupLocation: Button = findViewById(R.id.btn_backup_location)
         val tvFruits: TextView = findViewById(R.id.tv_fruits)
 
         val adapter = FruitListAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        fruitViewModel = ViewModelProvider(this).get(FruitViewModel::class.java)
+        fruitViewModel = ViewModelProvider(this)[FruitViewModel::class.java]
 
-        fruitViewModel.allFruit.observe(this, Observer { fruits ->
+        fruitViewModel.allFruit.observe(this, { fruits ->
             adapter.submitList(fruits)
         })
 
@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
         val sharedPrefs = "sampleBackup"
         val spEncryptBackup = "encryptBackup"
-        val spUseExternalStorage = "useExternalStorage"
+        val spStorageLocation = "storageLocation"
         val spEnableLog = "enableLog"
         val spUseMaxFileCount = "useMaxFileCount"
         val sharedPreferences = getSharedPreferences(sharedPrefs, Context.MODE_PRIVATE)
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         /*---------------------FAB Add Button--------------------------*/
         fab.setOnClickListener {
             val intent = Intent(this, ActivityAddEditFruit::class.java)
-            startActivityForResult(intent, ADD_FRUIT_REQUEST)
+            openAddEditActivity.launch(intent)
         }
 
         /*---------------------go to Java MainActivity--------------------------*/
@@ -113,15 +113,14 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         }
 
         var encryptBackup = sharedPreferences.getBoolean(spEncryptBackup, true)
-        var useExternalStorage = sharedPreferences.getBoolean(spUseExternalStorage, false)
+        var storageLocation = sharedPreferences.getInt(spStorageLocation, 1)
         var enableLog = sharedPreferences.getBoolean(spEnableLog, true)
         var useMaxFileCount = sharedPreferences.getBoolean(spUseMaxFileCount, false)
 
-
         /*---------------------set Properties--------------------------*/
         btnProperties.setOnClickListener {
-            val multiItems = arrayOf("Encrypt Backup", "use External Storage", "enable Log", "use maxFileCount = 5")
-            val checkedItems = booleanArrayOf(encryptBackup, useExternalStorage, enableLog, useMaxFileCount)
+            val multiItems = arrayOf("Encrypt Backup", "enable Log", "use maxFileCount = 5")
+            val checkedItems = booleanArrayOf(encryptBackup, enableLog, useMaxFileCount)
 
             MaterialAlertDialogBuilder(this)
                 .setTitle("Change Properties")
@@ -135,14 +134,10 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                             sharedPreferences.edit().putBoolean(spEncryptBackup, encryptBackup).apply()
                         }
                         1 -> {
-                            useExternalStorage = checked
-                            sharedPreferences.edit().putBoolean(spUseExternalStorage, useExternalStorage).apply()
-                        }
-                        2 -> {
                             enableLog = checked
                             sharedPreferences.edit().putBoolean(spEnableLog, enableLog).apply()
                         }
-                        3 -> {
+                        2 -> {
                             useMaxFileCount = checked
                             sharedPreferences.edit().putBoolean(spUseMaxFileCount, useMaxFileCount).apply()
                         }
@@ -151,15 +146,46 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .show()
         }
 
+        /*---------------------set Backup Location--------------------------*/
+        btnBackupLocation.setOnClickListener {
+            val storageItems = arrayOf("Internal", "External", "Custom Dialog", "Custom File")
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Change Storage")
+                .setPositiveButton("Ok", null)
+                .setSingleChoiceItems(storageItems, storageLocation-1) { _, which ->
+                    when (which) {
+                        0 -> {
+                            storageLocation = RoomBackup.BACKUP_FILE_LOCATION_INTERNAL
+                            sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply()
+
+                        }
+                        1 -> {
+                            storageLocation = RoomBackup.BACKUP_FILE_LOCATION_EXTERNAL
+                            sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply()
+                        }
+                        2 -> {
+                            storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG
+                            sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply()
+                        }
+                        3 -> {
+                            storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE
+                            sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply()
+                        }
+                    }
+                }
+                .show()
+        }
+
+        val backup = RoomBackup(this)
         /*---------------------Backup and Restore Database--------------------------*/
         btnBackup.setOnClickListener {
-            RoomBackup()
-                .context(this)
+            backup
+                .backupLocation(storageLocation)
+                .backupLocationCustomFile(File("${this.filesDir}/databasebackup/geilesBackup.sqlite3"))
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
                 .backupIsEncrypted(encryptBackup)
                 .customEncryptPassword(SECRET_PASSWORD)
-                .useExternalStorage(useExternalStorage)
                 //maxFileCount: else 1000 because i cannot surround it with if condition
                 .maxFileCount(if (useMaxFileCount) 5 else 1000)
                 .apply {
@@ -174,13 +200,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
         }
         btnRestore.setOnClickListener {
-            RoomBackup()
-                .context(this)
+            backup
+                .backupLocation(storageLocation)
+                .backupLocationCustomFile(File("${this.filesDir}/databasebackup/geilesBackup.sqlite3"))
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
                 .backupIsEncrypted(encryptBackup)
                 .customEncryptPassword(SECRET_PASSWORD)
-                .useExternalStorage(useExternalStorage)
                 .apply {
                     onCompleteListener { success, message ->
                         Log.d(TAG, "success: $success, message: $message")
@@ -203,7 +229,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
             /*---------------------do action on swipe--------------------------*/
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 //Item in recyclerview
-                val position = viewHolder.adapterPosition
+                val position = viewHolder.bindingAdapterPosition
                 val fruit = adapter.getFruitAt(position)!!
 
                 fruitViewModel.delete(fruit)
@@ -248,37 +274,27 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
     }
 
-
     /*---------------------when returning from |ActivityAddEditFruit| do something--------------------------*/
-    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    private val openAddEditActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
 
         /*---------------------If the Request was successful--------------------------*/
-        if (resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
             val name = data!!.getStringExtra(ActivityAddEditFruit.EXTRA_NAME)!!
-            val fruit = Fruit(name = name)
+            val id = data.getIntExtra(ActivityAddEditFruit.EXTRA_ID, -1)
+            val deleteFruit = data.getBooleanExtra(ActivityAddEditFruit.EXTRA_DELETE_FRUIT, false)
 
-            /*---------------------If the Request was a ADD fruit request--------------------------*/
-            if (requestCode == ADD_FRUIT_REQUEST && resultCode == Activity.RESULT_OK) {
+            val fruit = Fruit(name)
 
+            if (id == -1) {
                 fruitViewModel.insert(fruit)
-
-                /*---------------------If the Request was a EDIT fruit request--------------------------*/
-            } else if (requestCode == EDIT_FRUIT_REQUEST && resultCode == Activity.RESULT_OK) {
-                val id = data.getIntExtra(ActivityAddEditFruit.EXTRA_ID, -1)
-                val deleteFruit = data.getBooleanExtra(ActivityAddEditFruit.EXTRA_DELETE_FRUIT, false)
-
-                if (id == -1) {
-                    val snackbar = Snackbar
-                        .make(clMain, "Failed to update Fruit!", Snackbar.LENGTH_LONG)
-                    snackbar.show()
-                    return
-                }
-
+            } else {
                 fruit.id = id
-                if (deleteFruit) fruitViewModel.delete(fruit) else fruitViewModel.update(fruit)
+                if (deleteFruit) fruitViewModel.delete(fruit) else {
+                    fruitViewModel.update(fruit)
+                }
             }
+
         }
     }
 
@@ -287,6 +303,6 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         val intent = Intent(this, ActivityAddEditFruit::class.java)
         intent.putExtra(ActivityAddEditFruit.EXTRA_ID, fruit.id)
         intent.putExtra(ActivityAddEditFruit.EXTRA_NAME, fruit.name)
-        startActivityForResult(intent, EDIT_FRUIT_REQUEST)
+        openAddEditActivity.launch(intent)
     }
 }
