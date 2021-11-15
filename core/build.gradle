@@ -36,6 +36,16 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = 'com.ebner.roomdatabasebackup.core'
+                artifactId = 'Android-Room-Database-Backup'
+                version = defaultConfig.versionName
+            }
+        }
+    }
 }
 
 dependencies {
