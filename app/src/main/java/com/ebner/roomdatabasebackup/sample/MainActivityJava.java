@@ -29,6 +29,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+
 /**
  * MIT License
  * <p>
@@ -142,7 +144,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         final String[] multiItems = new String[]{"Encrypt Backup", "enable Log", "use maxFileCount = 5"};
         final boolean[] checkedItems = new boolean[]{encryptBackup, enableLog, useMaxFileCount};
-        final String[] storageItems = new String[]{"Internal", "External", "Custom"};
+        final String[] storageItems = new String[]{"Internal", "External", "Custom Dialog", "Custom File"};
 
         /*---------------------set Properties--------------------------*/
         btn_properties.setOnClickListener(v -> {
@@ -191,6 +193,10 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                         storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG;
                         sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply();
                         break;
+                    case 3:
+                        storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE;
+                        sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply();
+                        break;
                 }
             });
             materialAlertDialogBuilder.show();
@@ -201,6 +207,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         /*---------------------Backup and Restore Database--------------------------*/
         btn_backup.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
+            roomBackup.backupLocationCustomFile(new File(this.getFilesDir()+"/databasebackup/geilesBackup.sqlite3"));
             roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);
@@ -216,6 +223,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         btn_restore.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
+            roomBackup.backupLocationCustomFile(new File(this.getFilesDir()+"/databasebackup/geilesBackup.sqlite3"));
             roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);

@@ -27,6 +27,7 @@ import com.ebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 
 
 /**
@@ -147,7 +148,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
         /*---------------------set Backup Location--------------------------*/
         btnBackupLocation.setOnClickListener {
-            val storageItems = arrayOf("Internal", "External", "Custom")
+            val storageItems = arrayOf("Internal", "External", "Custom Dialog", "Custom File")
             MaterialAlertDialogBuilder(this)
                 .setTitle("Change Storage")
                 .setPositiveButton("Ok", null)
@@ -166,6 +167,10 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                             storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG
                             sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply()
                         }
+                        3 -> {
+                            storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE
+                            sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply()
+                        }
                     }
                 }
                 .show()
@@ -176,6 +181,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         btnBackup.setOnClickListener {
             backup
                 .backupLocation(storageLocation)
+                .backupLocationCustomFile(File("${this.filesDir}/databasebackup/geilesBackup.sqlite3"))
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
                 .backupIsEncrypted(encryptBackup)
@@ -196,6 +202,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         btnRestore.setOnClickListener {
             backup
                 .backupLocation(storageLocation)
+                .backupLocationCustomFile(File("${this.filesDir}/databasebackup/geilesBackup.sqlite3"))
                 .database(FruitDatabase.getInstance(this))
                 .enableLogDebug(enableLog)
                 .backupIsEncrypted(encryptBackup)

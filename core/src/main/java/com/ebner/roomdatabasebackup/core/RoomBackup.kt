@@ -78,6 +78,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
          * Code for custom backup location dialog, used for [backupLocation]
          */
         const val BACKUP_FILE_LOCATION_CUSTOM_DIALOG = 3
+
+        /**
+         * Code for custom backup file location, used for [backupLocation]
+         */
+        const val BACKUP_FILE_LOCATION_CUSTOM_FILE = 4
     }
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -93,6 +98,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     private var maxFileCount: Int? = null
     private var encryptPassword: String? = null
     private var backupLocation: Int = BACKUP_FILE_LOCATION_INTERNAL
+    private var backupLocationCustomFile: File? = null
 
     /**
      * Set RoomDatabase instance
@@ -180,13 +186,26 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     }
 
     /**
-     * Set you backup location. Available values see: [BACKUP_FILE_LOCATION_INTERNAL], [BACKUP_FILE_LOCATION_EXTERNAL] or [BACKUP_FILE_LOCATION_CUSTOM_DIALOG]
+     * Set you backup location. Available values see: [BACKUP_FILE_LOCATION_INTERNAL], [BACKUP_FILE_LOCATION_EXTERNAL], [BACKUP_FILE_LOCATION_CUSTOM_DIALOG] or [BACKUP_FILE_LOCATION_CUSTOM_FILE]
      *
      *
      * @param backupLocation Int, default = [BACKUP_FILE_LOCATION_INTERNAL]
      */
     fun backupLocation(backupLocation: Int): RoomBackup {
         this.backupLocation = backupLocation
+        return this
+    }
+
+    /**
+     * Set a custom file where to save or restore a backup.
+     * can be used for backup and restore
+     *
+     * Only available if [backupLocation] is set to [BACKUP_FILE_LOCATION_CUSTOM_FILE]
+     *
+     * @param backupLocationCustomFile File
+     */
+    fun backupLocationCustomFile(backupLocationCustomFile: File): RoomBackup {
+        this.backupLocationCustomFile = backupLocationCustomFile
         return this
     }
 
@@ -242,9 +261,15 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
 
-        if (backupLocation !in listOf(BACKUP_FILE_LOCATION_INTERNAL, BACKUP_FILE_LOCATION_EXTERNAL, BACKUP_FILE_LOCATION_CUSTOM_DIALOG)) {
+        if (backupLocation !in listOf(BACKUP_FILE_LOCATION_INTERNAL, BACKUP_FILE_LOCATION_EXTERNAL, BACKUP_FILE_LOCATION_CUSTOM_DIALOG, BACKUP_FILE_LOCATION_CUSTOM_FILE)) {
             if (enableLogDebug) Log.d(TAG, "backupLocation is missing")
             onCompleteListener?.onComplete(false, "backupLocation is missing")
+            return false
+        }
+
+        if (backupLocation == BACKUP_FILE_LOCATION_CUSTOM_FILE && backupLocationCustomFile == null) {
+            if (enableLogDebug) Log.d(TAG, "backupLocation is set to custom backup file, but no file is defined")
+            onCompleteListener?.onComplete(false, "backupLocation is set to custom backup file, but no file is defined")
             return false
         }
 
@@ -278,6 +303,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             Log.d(TAG, "Database Location: $DATABASE_FILE")
             Log.d(TAG, "INTERNAL_BACKUP_PATH: $INTERNAL_BACKUP_PATH")
             Log.d(TAG, "EXTERNAL_BACKUP_PATH: $EXTERNAL_BACKUP_PATH")
+            if (backupLocationCustomFile != null) Log.d(TAG, "backupLocationCustomFile: $backupLocationCustomFile")
         }
         return true
 
@@ -309,9 +335,6 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         //Needed for storage permissions request
         currentProcess = PROCESS_BACKUP
 
-        //Close the database
-        roomDatabase!!.close()
-
         //Create name for backup file, if no custom name is set: Database name + currentTime + .sqlite3
         var filename = if (customBackupFileName == null) "$dbName-${getTime()}.sqlite3" else customBackupFileName as String
         //Add .aes extension to filename, if file is encrypted
@@ -332,6 +355,10 @@ class RoomBackup(var context: Context) : FragmentActivity() {
                 permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
                 return
             }
+            BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
+                doBackup(backupLocationCustomFile!!)
+            }
+            else -> return
         }
     }
 
@@ -341,6 +368,8 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      * @param destination File
      */
     private fun doBackup(destination: File) {
+        //Close the database
+        roomDatabase!!.close()
         if (backupIsEncrypted) {
             val encryptedBytes = encryptBackup()
             val bos = BufferedOutputStream(FileOutputStream(destination, false))
@@ -368,6 +397,8 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      * @param destination OutputStream
      */
     private fun doBackup(destination: OutputStream) {
+        //Close the database
+        roomDatabase!!.close()
         if (backupIsEncrypted) {
             val encryptedBytes = encryptBackup()
             destination.write(encryptedBytes)
@@ -433,7 +464,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         currentProcess = PROCESS_RESTORE
 
         //Path of Backup Directory
-        var backupDirectory: File? = null
+        val backupDirectory: File
 
         when (backupLocation) {
             BACKUP_FILE_LOCATION_INTERNAL -> {
@@ -446,10 +477,16 @@ class RoomBackup(var context: Context) : FragmentActivity() {
                 permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
                 return
             }
+            BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
+                Log.d(TAG, "backupLocationCustomFile!!.exists()? : ${backupLocationCustomFile!!.exists()}")
+                doRestore(backupLocationCustomFile!!)
+                return
+            }
+            else -> return
         }
 
         //All Files in an Array of type File
-        val arrayOfFiles = backupDirectory!!.listFiles()
+        val arrayOfFiles = backupDirectory.listFiles()
 
         //If array is null or empty show "error" and return
         if (arrayOfFiles.isNullOrEmpty()) {
@@ -494,20 +531,16 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      * @param source File
      */
     private fun doRestore(source: File) {
+        //Close the database
+        roomDatabase!!.close()
         val fileExtension = source.extension
         if (backupIsEncrypted) {
-            if (fileExtension == "sqlite3") {
-                //Copy back database and replace current database, if file is not encrypted
-                copy(source, DATABASE_FILE)
-                if (enableLogDebug) Log.d(TAG, "File is not encrypted, trying to restore")
-            } else {
-                copy(source, TEMP_BACKUP_FILE)
-                val decryptedBytes = decryptBackup()
-                val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
-                bos.write(decryptedBytes)
-                bos.flush()
-                bos.close()
-            }
+            copy(source, TEMP_BACKUP_FILE)
+            val decryptedBytes = decryptBackup()
+            val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
+            bos.write(decryptedBytes)
+            bos.flush()
+            bos.close()
         } else {
             if (fileExtension == "aes") {
                 if (enableLogDebug) Log.d(TAG, "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)")
@@ -528,6 +561,8 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      * @param source InputStream
      */
     private fun doRestore(source: InputStream) {
+        //Close the database
+        roomDatabase!!.close()
         if (backupIsEncrypted) {
             //Save inputstream to temp file
             source.use { input ->
@@ -561,8 +596,6 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      */
     private fun restoreSelectedInternalExternalFile(filename: String) {
         if (enableLogDebug) Log.d(TAG, "Restore selected file...")
-        //Close the database
-        roomDatabase!!.close()
 
         when (backupLocation) {
             BACKUP_FILE_LOCATION_INTERNAL -> {
@@ -571,6 +604,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             BACKUP_FILE_LOCATION_EXTERNAL -> {
                 doRestore(File("$EXTERNAL_BACKUP_PATH/$filename"))
             }
+            else -> return
         }
     }
 
@@ -671,23 +705,23 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      */
     private fun deleteOldBackup(): Boolean {
         //Path of Backup Directory
-        var backupDirectory: File? = null
 
-        when (backupLocation) {
+        val backupDirectory: File = when (backupLocation) {
             BACKUP_FILE_LOCATION_INTERNAL -> {
-                backupDirectory = INTERNAL_BACKUP_PATH
+                INTERNAL_BACKUP_PATH
             }
             BACKUP_FILE_LOCATION_EXTERNAL -> {
-                backupDirectory = File("$EXTERNAL_BACKUP_PATH/")
+                File("$EXTERNAL_BACKUP_PATH/")
             }
             BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
                 //In custom backup location no backups will be removed
                 return true
             }
+            else -> return true
         }
 
         //All Files in an Array of type File
-        val arrayOfFiles = backupDirectory!!.listFiles()
+        val arrayOfFiles = backupDirectory.listFiles()
 
         //If array is null or empty nothing to do and return
         if (arrayOfFiles.isNullOrEmpty()) {

@@ -71,7 +71,7 @@ implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta07'
     ```kotlin
     RoomBackup(this)
     ```
-    
+
   * Instance of your room database
 
 
@@ -87,18 +87,18 @@ The following options are optional and the default options
 
   * Enable logging, for debugging and some error messages
 
-   
+
     ```kotlin
     .enableLogDebug(false)
     ```
-    
+
   * Set custom log tag
- 
-    
+
+
     ```kotlin
     .customLogTag("debug_RoomBackup")
     ```   
-     
+
   * Enable and set maxFileCount
       * if file count of Backups > maxFileCount all old / the oldest backup file will be deleted
       * can be used with internal and external storage
@@ -108,18 +108,18 @@ The following options are optional and the default options
     ```kotlin
     .maxFileCount(5)
     ```
-    
+
   * Encrypt your backup
       * Is encrypted with AES encryption
       * uses a random 15 digit long key with alphanumeric characters
       * this key is saved in [EncryptedSharedPreferences](https://developer.android.com/reference/androidx/security/crypto/EncryptedSharedPreferences)
       * backup name is default backup name + ".aes"
-    
-    
+
+
     ```kotlin
     .backupIsEncrypted(false)
     ```
-    
+
   * Encrypt your backup with your own password / key
       * This property is only working, if ```.backupIsEncrypted(true)``` is set
       * If you use the key to encrypt the backup, you will also need it to decrypt
@@ -132,63 +132,75 @@ The following options are optional and the default options
     ```kotlin
     .customEncryptPassword("YOUR_SECRET_PASSWORD")
     ```
-    
-    
+
   * Save your backup to different storage
       * External
           * storage path: /storage/emulated/0/Android/data/*package*/files/backup/
-          * This files will be deleted, if you uninstall your app  
+          * This files will be deleted, if you uninstall your app
           * ```RoomBackup.BACKUP_FILE_LOCATION_EXTERNAL```
       * Internal
           * Private, storage not accessible
-          * This files will be deleted, if you uninstall your app  
+          * This files will be deleted, if you uninstall your app
           * ```RoomBackup.BACKUP_FILE_LOCATION_INTERNAL```
-      * Custom
+      * Custom Dialog
           * You can choose to save or restore where ever you want. A CreateDocument() or OpenDocument() Activity will be launched where you can choose the location
-          * If your backup is encrypted I reccomend you using a custom encrption password else you can't restore your backup  
+          * If your backup is encrypted I reccomend you using a custom encrption password else you can't restore your backup
           * ```RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG```
+      * Custom File
+          * You can choose to save or restore to/from a custom File. 
+          * If your backup is encrypted I reccomend you using a custom encrption password else you can't restore your backup
+          * Please use ```backupLocationCustomFile(File)``` to set a custom File
+          * ```RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE```
 
 
     ```kotlin
     .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL)
     ```
-    
+
+  * Set a custom File to save/restore to/from  
+    Only working if ```backupLocation``` is set to ```BACKUP_FILE_LOCATION_CUSTOM_FILE```  
+    You have to define a File withe Filename and extension
+
+    ```kotlin
+    .backupLocationCustomFile(backupLocationCustomFile: File)
+    ```
+
   * Set a custom dialog title, when showing list of available backups to restore (only for external or internal storage)
-    
-    
+
+
     ```kotlin
     .customRestoreDialogTitle("Choose file to restore")
     ```
-    
+
   * Set your custom name to the Backup files
-    
+
     **Attention**\
     If a backup file with the same name already exists, it will be replaced
-    
+
 
     ```kotlin
     .customBackupFileName(*DatabaseName* + *currentTime* + ".sqlite3")
     ```
-    
+
   * Run some code, after backup / restore process is finished
       * success: Boolean (If backup / restore was successful = true)
       * message: String (message with simple hints, if backup / restore failed)
-    
-    
+
+
     ```kotlin
     .onCompleteListener { success, message ->
     }
     ```
-    
+
   * Restart your Application. Can be implemented in the onCompleteListener, when "success == true"
-      
+
       **Attention**\
       it does not always work reliably!\
       But you can use other methods.\
       Important is that all activities / fragments that are still open must be closed and reopened\
       Because the Database instance is a new one, and the old activities / fragments are trying to work with the old instance
-      
-      
+
+
     ```kotlin
     .restartApp(Intent(this@MainActivity, MainActivity::class.java))
     ```
@@ -215,9 +227,9 @@ The following options are optional and the default options
             }
             .backup()
     ```
-    
+
 * ##### Restore
-    
+
     ```kotlin
         val backup = RoomBackup(this)
         ...
@@ -240,7 +252,7 @@ The following options are optional and the default options
 ### Example Java
 
 * ##### Backup
-    
+
     ```java
     final RoomBackup roomBackup = new RoomBackup(MainActivityJava.this);
     ...
@@ -255,9 +267,9 @@ The following options are optional and the default options
     });
     roomBackup.backup();
     ```
-    
+
 * ##### Restore
-    
+
     ```java
     final RoomBackup roomBackup = new RoomBackup(MainActivityJava.this);
     ...
