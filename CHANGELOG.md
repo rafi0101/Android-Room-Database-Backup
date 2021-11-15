@@ -1,6 +1,6 @@
 # Android-Room-Database-Backup Changelog
 
-## [v1.0.0-beta07] - 2021-11-14
+## [v1.0.0-beta08] - 2021-11-14
 
 ### Features
 - **Custom Backup Location:** ([#9](https://github.com/rafi0101/Android-Room-Database-Backup/issues/9))
