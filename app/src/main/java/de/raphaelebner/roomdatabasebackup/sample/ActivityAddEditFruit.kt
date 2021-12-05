@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import com.ebner.roomdatabasebackup.sample.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -39,9 +38,9 @@ import com.google.android.material.textfield.TextInputLayout
 class ActivityAddEditFruit : AppCompatActivity() {
 
     companion object {
-        const val EXTRA_ID = "com.ebner.roomdatabasebackup.sample.EXTRA_ID"
-        const val EXTRA_NAME = "com.ebner.roomdatabasebackup.sample.EXTRA_NAME"
-        const val EXTRA_DELETE_FRUIT = "com.ebner.roomdatabasebackup.sample.EXTRA_DELETE_FRUIT"
+        const val EXTRA_ID = "de.raphaelebner.roomdatabasebackup.sample.EXTRA_ID"
+        const val EXTRA_NAME = "de.raphaelebner.roomdatabasebackup.sample.EXTRA_NAME"
+        const val EXTRA_DELETE_FRUIT = "de.raphaelebner.roomdatabasebackup.sample.EXTRA_DELETE_FRUIT"
     }
 
     private lateinit var tietFruit: TextInputEditText

@@ -50,7 +50,7 @@ import java.util.*
 class RoomBackup(var context: Context) : FragmentActivity() {
 
     companion object {
-        private const val SHARED_PREFS = "com.ebner.roomdatabasebackup"
+        private const val SHARED_PREFS = "de.raphaelebner.roomdatabasebackup"
         private var TAG = "debug_RoomBackup"
         private lateinit var INTERNAL_BACKUP_PATH: File
         private lateinit var TEMP_BACKUP_PATH: File

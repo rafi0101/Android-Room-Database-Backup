@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.raphaelebner.roomdatabasebackup.core.RoomBackup
-import com.ebner.roomdatabasebackup.sample.R
 import de.raphaelebner.roomdatabasebackup.sample.database.main.FruitDatabase
 import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.Fruit
 import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitListAdapter

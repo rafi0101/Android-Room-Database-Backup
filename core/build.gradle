@@ -16,7 +16,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
-        versionName '1.0.0-beta08'
+        versionName '1.0.0-beta08-1'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -40,7 +40,7 @@ android {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                groupId = 'com.ebner.roomdatabasebackup.core'
+                groupId = 'de.raphaelebner.roomdatabasebackup.core'
                 artifactId = 'Android-Room-Database-Backup'
                 version = defaultConfig.versionName
             }
