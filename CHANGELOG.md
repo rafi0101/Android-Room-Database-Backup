@@ -1,5 +1,15 @@
 # Android-Room-Database-Backup Changelog
 
+## [v1.0.0-beta09] - 2021-12-06
+
+### Breaking Changes
+- Package name changes from `com.ebner.roomdatabasebackup.core.RoomBackup` to `de.raphaelebner.roomdatabasebackup.core.RoomBackup`
+
+--> Next step is to change from Jitpack to MavenCentral
+
+### Upgrading Notes
+- You need to import the library by the new package name and delete the old import. Your IDE may helps you with these steps.
+
 ## [v1.0.0-beta08] - 2021-11-14
 
 ### Features
