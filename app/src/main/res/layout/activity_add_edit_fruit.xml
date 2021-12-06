@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".ActivityAddEditFruit">
+    tools:context="de.raphaelebner.roomdatabasebackup.sample.ActivityAddEditFruit">
 
 
     <com.google.android.material.textfield.TextInputLayout
