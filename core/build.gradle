@@ -37,12 +37,16 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
+}
+
+afterEvaluate {
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            release(MavenPublication) {
+                from components.release
                 groupId = 'de.raphaelebner.roomdatabasebackup.core'
                 artifactId = 'Android-Room-Database-Backup'
-                version = defaultConfig.versionName
+                version = android.defaultConfig.versionName
             }
         }
     }

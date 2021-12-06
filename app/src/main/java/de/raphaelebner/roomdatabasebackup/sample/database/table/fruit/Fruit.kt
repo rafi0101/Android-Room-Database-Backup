@@ -2,6 +2,7 @@ package de.raphaelebner.roomdatabasebackup.sample.database.table.fruit
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 /**
@@ -37,6 +38,7 @@ data class Fruit(
     @ColumnInfo(name = "name")
     var name: String
 ) {
+    @Ignore
     constructor(name: String) : this(0, name) {
         this.name = name
     }
