@@ -19,20 +19,24 @@ Features
 ---------
 * Create simple backups of your room database
 * Encrypt the backup file with AES encryption
-* Save the backup to internal (private) or external (public) app storage
+* Save the backup to any type of storage
 * Material design
 * Written in Kotlin
 
 Content
 -----------
 * [Features](#Features)
+* [Changelog](#Changelog)
 * [Getting started](#Getting-started)
 * [Usage](#Usage)
 * [Sample app](#Sample-app)
 * [Developed by](#Developed-by)
 * [License](#License)
 
-[Changelog](CHANGELOG.md)
+ 
+ Changelog
+-----------
+[Changelog and Upgrading notes](CHANGELOG.md)
 
  Getting started
 -----------
@@ -127,8 +131,8 @@ The following options are optional and the default options
       
       **Attention**  
       i do not assume any liability for the loss of your key
-      
-      
+
+ 
     ```kotlin
     .customEncryptPassword("YOUR_SECRET_PASSWORD")
     ```
@@ -152,7 +156,10 @@ The following options are optional and the default options
           * Please use ```backupLocationCustomFile(File)``` to set a custom File
           * ```RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE```
 
+      **Attention**  
+      For custom dialog and custom file I only verified the functionality for local storage. For thirt party storage please try and contact me if it is not working. I hope I can find a solution and fix it :)
 
+ 
     ```kotlin
     .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL)
     ```
