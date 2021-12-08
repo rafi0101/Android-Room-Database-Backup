@@ -1,0 +1,97 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: 'org.jetbrains.dokka'
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    if (project.plugins.findPlugin("com.android.library")) {
+        // For Android libraries
+        from android.sourceSets.main.java.srcDirs
+        from android.sourceSets.main.kotlin.srcDirs
+    } else {
+        // For pure Kotlin libraries, in case you have them
+        from sourceSets.main.java.srcDirs
+        from sourceSets.main.kotlin.srcDirs
+    }
+}
+
+tasks.withType(dokkaHtmlPartial.getClass()).configureEach {
+    pluginsMapConfiguration.set(
+            ["org.jetbrains.dokka.base.DokkaBase": """{ "separateInheritedMembers": true}"""]
+    )
+}
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    archiveClassifier.set("javadoc")
+    from dokkaJavadoc.outputDirectory
+}
+
+task htmldocJar(type: Jar, dependsOn: dokkaHtml) {
+    archiveClassifier.set("htmldoc")
+    from dokkaHtml.outputDirectory
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives javadocJar
+    archives htmldocJar
+}
+
+group = PUBLISH_GROUP_ID
+version = PUBLISH_VERSION
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // The coordinates of the library, being set from variables that
+                // we'll set up later
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version PUBLISH_VERSION
+
+                // Two artifacts, the `aar` (or `jar`) and the sources
+                if (project.plugins.findPlugin("com.android.library")) {
+                    from components.release
+                } else {
+                    from components.java
+                }
+
+                artifact javadocJar
+                artifact htmldocJar
+                artifact androidSourcesJar
+
+                // Mostly self-explanatory metadata
+                pom {
+                    name = PUBLISH_ARTIFACT_ID
+                    description = 'Simple tool to Backup and Restore your Room Database'
+                    url = 'https://github.com/rafi0101/Android-Room-Database-Backup'
+                    licenses {
+                        license {
+                            name = 'MIT License'
+                            url = 'https://github.com/rafi0101/Android-Room-Database-Backup/blob/master/LICENSE'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'rafi0101'
+                            name = 'Raphael Ebner'
+                        }
+                    }
+
+                    // Version control info - if you're using GitHub, follow the
+                    // format as seen here
+                    scm {
+                        connection = 'scm:git:github.com/rafi0101/Android-Room-Database-Backup.git'
+                        developerConnection = 'scm:git:ssh://github.com/rafi0101/Android-Room-Database-Backup.git'
+                        url = 'https://github.com/rafi0101/Android-Room-Database-Backup/tree/master'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications
+}

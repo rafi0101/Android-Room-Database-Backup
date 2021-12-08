@@ -1,7 +1,10 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'maven-publish'
+plugins {
+    id('com.android.library')
+    id('kotlin-android')
+    id('kotlin-kapt')
+    id('maven-publish')
+    id('org.jetbrains.dokka')
+}
 
 android {
     compileSdkVersion 31
@@ -39,18 +42,13 @@ android {
 
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = 'de.raphaelebner.roomdatabasebackup.core'
-                artifactId = 'Android-Room-Database-Backup'
-                version = android.defaultConfig.versionName
-            }
-        }
-    }
+ext {
+    PUBLISH_GROUP_ID = 'de.raphaelebner'
+    PUBLISH_VERSION = android.defaultConfig.versionName
+    PUBLISH_ARTIFACT_ID = 'Android-Room-Database-Backup'
 }
+
+apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
