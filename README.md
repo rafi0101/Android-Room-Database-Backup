@@ -2,7 +2,7 @@
 
 
 ![Build](https://github.com/rafi0101/Android-Room-Database-Backup/workflows/Android%20CI/badge.svg)
-[![](https://jitpack.io/v/rafi0101/Android-Room-Database-Backup.svg)](https://jitpack.io/#rafi0101/Android-Room-Database-Backup)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.raphaelebner/roomdatabasebackup/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.raphaelebner/roomdatabasebackup)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 ![Language](https://img.shields.io/badge/language-Kotlin-orange.svg)
 [![PRWelcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/rafi0101/Android-Room-Database-Backup/pulls)
@@ -33,14 +33,16 @@ Content
 * [Developed by](#Developed-by)
 * [License](#License)
 
- 
- Changelog
+Changelog
 -----------
 [Changelog and Upgrading notes](CHANGELOG.md)
 
- Getting started
+Getting started
 -----------
-Add the JitPack repository to your project-level `build.gradle` file.
+
+#### DEPRECATED:
+
+~~Add the JitPack repository to your project-level `build.gradle`  file.~~
 
 ```groovy
 allprojects {
@@ -51,13 +53,23 @@ allprojects {
 }
 ```
 
-Then, add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
+~~Then, add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle`
+file.~~
 
 ```groovy
 implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta09'
 ```
 
- Usage
+### New:
+
+From now on the Android-Room-Database-Backup library is pushed
+to [Maven Central](https://search.maven.org/artifact/de.raphaelebner/roomdatabasebackup/).
+
+```groovy
+implementation 'de.raphaelebner:roomdatabasebackup:1.0.0-beta09'
+```
+
+Usage
 -----------
 
 * [Properties](#Properties)
@@ -68,7 +80,7 @@ implementation 'com.github.rafi0101:Android-Room-Database-Backup:1.0.0-beta09'
 
 **Required**
 
-  * Current context  
+* Current context  
   **Attention**  
     Must be declared outside of an onClickListener before lifecycle state changes to started
 

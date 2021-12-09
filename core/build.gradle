@@ -45,7 +45,7 @@ android {
 ext {
     PUBLISH_GROUP_ID = 'de.raphaelebner'
     PUBLISH_VERSION = android.defaultConfig.versionName
-    PUBLISH_ARTIFACT_ID = 'Android-Room-Database-Backup'
+    PUBLISH_ARTIFACT_ID = 'roomdatabasebackup'
 }
 
 apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"
