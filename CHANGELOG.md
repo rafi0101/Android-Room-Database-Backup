@@ -4,18 +4,15 @@
 
 ### Breaking Changes
 
-- onCompleteListener provides now
-  an [exitCode](https://github.com/rafi0101/Android-Room-Database-Backup#exit-codes)
+- onCompleteListener provides now an [exitCode](https://github.com/rafi0101/Android-Room-Database-Backup#exit-codes)
 
 ### Fixes
 
-- Crash when database restoring with wrong
-  password: ([#13](https://github.com/rafi0101/Android-Room-Database-Backup/issues/13))
+- Crash when database restoring with wrong password: ([#13](https://github.com/rafi0101/Android-Room-Database-Backup/issues/13))
 
 ### Upgrading Notes
 
-- Add the exitCode property to your
-  onCompleteListeners. [Example](https://github.com/rafi0101/Android-Room-Database-Backup/commit/635f79ec9a14da0fc791c532cbb451450d9157fa#diff-b4c3c770527e11f87f1102175de53b984e0070e801070f5025875fe0c02b89b6L192-R198)
+- Add the exitCode property to your onCompleteListeners. [Example](https://github.com/rafi0101/Android-Room-Database-Backup/commit/635f79ec9a14da0fc791c532cbb451450d9157fa#diff-b4c3c770527e11f87f1102175de53b984e0070e801070f5025875fe0c02b89b6L192-R198)
 
 ## [v1.0.0-beta09] - 2021-12-06
 

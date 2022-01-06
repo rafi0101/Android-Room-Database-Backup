@@ -215,7 +215,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
             if (useMaxFileCount) roomBackup.maxFileCount(5);
             roomBackup.onCompleteListener((success, message, exitCode) -> {
-                Log.d(TAG, "oncomplete: " + success + ", message: " + message);
+                Log.d(TAG, "oncomplete: " + success + ", message: " + message + ", exitCode: " + exitCode);
                 if (success)
                     roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
             });
@@ -231,7 +231,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             roomBackup.backupIsEncrypted(encryptBackup);
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
             roomBackup.onCompleteListener((success, message, exitCode) -> {
-                Log.d(TAG, "oncomplete: " + success + ", message: " + message);
+                Log.d(TAG, "oncomplete: " + success + ", message: " + message + ", exitCode: " + exitCode);
                 if (success)
                     roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
             });

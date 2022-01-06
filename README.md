@@ -263,8 +263,8 @@ They can be calles using ```OnCompleteListener.$NAME$```
             .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL)
             .maxFileCount(5)
             .apply {
-                onCompleteListener { success, message ->
-                    Log.d(TAG, "success: $success, message: $message")
+                onCompleteListener { success, message, exitCode ->
+                    Log.d(TAG, "success: $success, message: $message, exitCode: $exitCode")
                     if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                 }
             }
@@ -283,11 +283,10 @@ They can be calles using ```OnCompleteListener.$NAME$```
             .customEncryptPassword("YOUR_SECRET_PASSWORD")
             .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL)
             .apply {
-                onCompleteListener { success, message ->
-                    Log.d(TAG, "success: $success, message: $message")
+                onCompleteListener { success, message, exitCode ->
+                    Log.d(TAG, "success: $success, message: $message, exitCode: $exitCode")
                     if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                 }
-        
             }
             .restore()
     ```
@@ -304,8 +303,8 @@ They can be calles using ```OnCompleteListener.$NAME$```
     roomBackup.backupIsEncrypted(encryptBackup);
     roomBackup.backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL);
     roomBackup.maxFileCount(5);
-    roomBackup.onCompleteListener((success, message) -> {
-        Log.d(TAG, "success: " + success + ", message: " + message);
+    roomBackup.onCompleteListener((success, message, exitCode) -> {
+        Log.d(TAG, "success: " + success + ", message: " + message + ", exitCode: " + exitCode);
         if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
     });
     roomBackup.backup();
@@ -320,8 +319,8 @@ They can be calles using ```OnCompleteListener.$NAME$```
     roomBackup.enableLogDebug(enableLog);
     roomBackup.backupIsEncrypted(encryptBackup);
     roomBackup.backupLocation(RoomBackup.BACKUP_FILE_LOCATION_INTERNAL);
-    roomBackup.onCompleteListener((success, message) -> {
-        Log.d(TAG, "success: " + success + ", message: " + message);
+    roomBackup.onCompleteListener((success, message, exitCode) -> {
+        Log.d(TAG, "success: " + success + ", message: " + message + ", exitCode: " + exitCode);
         if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
     });
     roomBackup.restore();
