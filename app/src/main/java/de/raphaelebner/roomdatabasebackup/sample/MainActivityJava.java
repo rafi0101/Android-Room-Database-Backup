@@ -19,17 +19,18 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import de.raphaelebner.roomdatabasebackup.core.RoomBackup;
-import de.raphaelebner.roomdatabasebackup.sample.database.main.FruitDatabase;
-import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.Fruit;
-import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitListAdapter;
-import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+
+import de.raphaelebner.roomdatabasebackup.core.RoomBackup;
+import de.raphaelebner.roomdatabasebackup.sample.database.main.FruitDatabase;
+import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.Fruit;
+import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitListAdapter;
+import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel;
 
 /**
  * MIT License
@@ -213,9 +214,10 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             roomBackup.backupIsEncrypted(encryptBackup);
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
             if (useMaxFileCount) roomBackup.maxFileCount(5);
-            roomBackup.onCompleteListener((success, message) -> {
+            roomBackup.onCompleteListener((success, message, exitCode) -> {
                 Log.d(TAG, "oncomplete: " + success + ", message: " + message);
-                if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
+                if (success)
+                    roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
             });
             roomBackup.backup();
 
@@ -228,9 +230,10 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
-            roomBackup.onCompleteListener((success, message) -> {
+            roomBackup.onCompleteListener((success, message, exitCode) -> {
                 Log.d(TAG, "oncomplete: " + success + ", message: " + message);
-                if (success) roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
+                if (success)
+                    roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
             });
             roomBackup.restore();
 

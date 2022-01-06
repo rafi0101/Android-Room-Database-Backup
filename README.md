@@ -75,6 +75,7 @@ Usage
 -----------
 
 * [Properties](#Properties)
+* [Exit Codes](#Exit-Codes)
 * [Example Kotlin](#Example-Kotlin)
 * [Example Java](#Example-Java)
 
@@ -215,16 +216,38 @@ The following options are optional and the default options
 
   * Restart your Application. Can be implemented in the onCompleteListener, when "success == true"
 
-      **Attention**\
-      it does not always work reliably!\
-      But you can use other methods.\
-      Important is that all activities / fragments that are still open must be closed and reopened\
-      Because the Database instance is a new one, and the old activities / fragments are trying to work with the old instance
-
+    **Attention**\
+    it does not always work reliably!\
+    But you can use other methods.\
+    Important is that all activities / fragments that are still open must be closed and reopened\
+    Because the Database instance is a new one, and the old activities / fragments are trying to
+    work with the old instance
 
     ```kotlin
     .restartApp(Intent(this@MainActivity, MainActivity::class.java))
     ```
+
+### Exit Codes
+
+Here are all exit codes for the onCompleteListener.  
+They can be calles using ```OnCompleteListener.$NAME$```
+
+| Exit Code | Name                                                 | Description  |
+| --------- | :--------------------------------------------------- | ------------ |
+| 0         | ```EXIT_CODE_SUCCESS```                              | No error, action successful |
+| 1         | ```EXIT_CODE_ERROR```                                | Other Error |
+| 2         | ```EXIT_CODE_ERROR_BACKUP_FILE_CHOOSER```            | Error while choosing backup to restore. Maybe no file selected |
+| 3         | ```EXIT_CODE_ERROR_BACKUP_FILE_CREATOR```            | Error while choosing backup file to create. Maybe no file selected |
+| 4         | ```EXIT_CODE_ERROR_BACKUP_LOCATION_FILE_MISSING```   | [BACKUP_FILE_LOCATION_CUSTOM_FILE] is set but [RoomBackup.backupLocationCustomFile] is not set |
+| 5         | ```EXIT_CODE_ERROR_BACKUP_LOCATION_MISSING```        | [RoomBackup.backupLocation] is not set |
+| 6         | ```EXIT_CODE_ERROR_BY_USER_CANCELED```               | Restore dialog for internal/external storage was canceled by user |
+| 7         | ```EXIT_CODE_ERROR_DECRYPTION_ERROR```               | Cannot decrypt provided backup file |
+| 8         | ```EXIT_CODE_ERROR_ENCRYPTION_ERROR```               | Cannot encrypt database backup |
+| 9         | ```EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED```    | You tried to restore a encrypted backup but [RoomBackup.backupIsEncrypted] is set to false |
+| 10        | ```EXIT_CODE_ERROR_RESTORE_NO_BACKUPS_AVAILABLE```   | No backups to restore are available in internal/external sotrage |
+| 11        | ```EXIT_CODE_ERROR_ROOM_DATABASE_MISSING```          | No room database to backup is provided |
+| 12        | ```EXIT_CODE_ERROR_STORAGE_PERMISSONS_NOT_GRANTED``` | Storage permissions not granted for custom dialog |
+| 13        | ```EXIT_CODE_ERROR_WRONG_DECRYPTION_PASSWORD```      | Cannot decrypt provided backup file because the password is incorrect |
 
 ### Example Kotlin
 

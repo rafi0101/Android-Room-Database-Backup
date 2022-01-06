@@ -147,10 +147,10 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      *
      * @param listener (success: Boolean, message: String) -> Unit
      */
-    fun onCompleteListener(listener: (success: Boolean, message: String) -> Unit): RoomBackup {
+    fun onCompleteListener(listener: (success: Boolean, message: String, exitCode: Int) -> Unit): RoomBackup {
         this.onCompleteListener = object : OnCompleteListener {
-            override fun onComplete(success: Boolean, message: String) {
-                listener(success, message)
+            override fun onComplete(success: Boolean, message: String, exitCode: Int) {
+                listener(success, message, exitCode)
             }
         }
         return this
@@ -252,7 +252,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     private fun initRoomBackup(): Boolean {
         if (roomDatabase == null) {
             if (enableLogDebug) Log.d(TAG, "roomDatabase is missing")
-            onCompleteListener?.onComplete(false, "roomDatabase is missing")
+            onCompleteListener?.onComplete(
+                false,
+                "roomDatabase is missing",
+                OnCompleteListener.EXIT_CODE_ERROR_ROOM_DATABASE_MISSING
+            )
             //       throw IllegalArgumentException("roomDatabase is not initialized")
             return false
         }
@@ -264,13 +268,24 @@ class RoomBackup(var context: Context) : FragmentActivity() {
 
         if (backupLocation !in listOf(BACKUP_FILE_LOCATION_INTERNAL, BACKUP_FILE_LOCATION_EXTERNAL, BACKUP_FILE_LOCATION_CUSTOM_DIALOG, BACKUP_FILE_LOCATION_CUSTOM_FILE)) {
             if (enableLogDebug) Log.d(TAG, "backupLocation is missing")
-            onCompleteListener?.onComplete(false, "backupLocation is missing")
+            onCompleteListener?.onComplete(
+                false,
+                "backupLocation is missing",
+                OnCompleteListener.EXIT_CODE_ERROR_BACKUP_LOCATION_MISSING
+            )
             return false
         }
 
         if (backupLocation == BACKUP_FILE_LOCATION_CUSTOM_FILE && backupLocationCustomFile == null) {
-            if (enableLogDebug) Log.d(TAG, "backupLocation is set to custom backup file, but no file is defined")
-            onCompleteListener?.onComplete(false, "backupLocation is set to custom backup file, but no file is defined")
+            if (enableLogDebug) Log.d(
+                TAG,
+                "backupLocation is set to custom backup file, but no file is defined"
+            )
+            onCompleteListener?.onComplete(
+                false,
+                "backupLocation is set to custom backup file, but no file is defined",
+                OnCompleteListener.EXIT_CODE_ERROR_BACKUP_LOCATION_FILE_MISSING
+            )
             return false
         }
 
@@ -389,7 +404,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         }
 
         if (enableLogDebug) Log.d(TAG, "Backup done, encrypted($backupIsEncrypted) and saved to $destination")
-        onCompleteListener?.onComplete(true, "success")
+        onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
     }
 
     /**
@@ -414,7 +429,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             if (!deleted) return
         }
         if (enableLogDebug) Log.d(TAG, "Backup done, encrypted($backupIsEncrypted) and saved to $destination")
-        onCompleteListener?.onComplete(true, "success")
+        onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
     }
 
     /**
@@ -443,7 +458,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
 
         } catch (e: Exception) {
             if (enableLogDebug) Log.d(TAG, "error during encryption: ${e.message}")
-            onCompleteListener?.onComplete(false, "error during encryption")
+            onCompleteListener?.onComplete(
+                false,
+                "error during encryption",
+                OnCompleteListener.EXIT_CODE_ERROR_ENCRYPTION_ERROR
+            )
             return null
         }
     }
@@ -492,7 +511,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         //If array is null or empty show "error" and return
         if (arrayOfFiles.isNullOrEmpty()) {
             if (enableLogDebug) Log.d(TAG, "No backups available to restore")
-            onCompleteListener?.onComplete(false, "No backups available")
+            onCompleteListener?.onComplete(
+                false,
+                "No backups available",
+                OnCompleteListener.EXIT_CODE_ERROR_RESTORE_NO_BACKUPS_AVAILABLE
+            )
             Toast.makeText(context, "No backups available to restore", Toast.LENGTH_SHORT).show()
             return
         }
@@ -521,7 +544,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             }
             .setOnCancelListener {
                 if (enableLogDebug) Log.d(TAG, "Restore dialog canceled")
-                onCompleteListener?.onComplete(false, "Restore dialog canceled")
+                onCompleteListener?.onComplete(
+                    false,
+                    "Restore dialog canceled",
+                    OnCompleteListener.EXIT_CODE_ERROR_BY_USER_CANCELED
+                )
             }
             .show()
     }
@@ -544,8 +571,15 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             bos.close()
         } else {
             if (fileExtension == "aes") {
-                if (enableLogDebug) Log.d(TAG, "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)")
-                onCompleteListener?.onComplete(false, "cannot restore database, see Log for more details (if enabled)")
+                if (enableLogDebug) Log.d(
+                    TAG,
+                    "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)"
+                )
+                onCompleteListener?.onComplete(
+                    false,
+                    "cannot restore database, see Log for more details (if enabled)",
+                    OnCompleteListener.EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED
+                )
                 return
             }
             //Copy back database and replace current database
@@ -553,7 +587,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         }
 
         if (enableLogDebug) Log.d(TAG, "Restore done, decrypted($backupIsEncrypted) and restored from $source")
-        onCompleteListener?.onComplete(true, "success")
+        onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
     }
 
     /**
@@ -592,7 +626,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         }
 
         if (enableLogDebug) Log.d(TAG, "Restore done, decrypted($backupIsEncrypted) and restored from $source")
-        onCompleteListener?.onComplete(true, "success")
+        onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
     }
 
     /**
@@ -639,14 +673,16 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             if (enableLogDebug) Log.d(TAG, "error during decryption (wrong password): ${e.message}")
             onCompleteListener?.onComplete(
                 false,
-                "error during decryption (wrong password) see Log for more details (if enabled)"
+                "error during decryption (wrong password) see Log for more details (if enabled)",
+                OnCompleteListener.EXIT_CODE_ERROR_WRONG_DECRYPTION_PASSWORD
             )
             return null
         } catch (e: Exception) {
             if (enableLogDebug) Log.d(TAG, "error during decryption: ${e.message}")
             onCompleteListener?.onComplete(
                 false,
-                "error during decryption see Log for more details (if enabled)"
+                "error during decryption see Log for more details (if enabled)",
+                OnCompleteListener.EXIT_CODE_ERROR_DECRYPTION_ERROR
             )
             return null
         }
@@ -660,7 +696,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     private val permissionRequestLauncher = (context as ComponentActivity).registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
         permissions.entries.forEach {
             if (!it.value) {
-                onCompleteListener?.onComplete(false, "storage permissions are required, please allow!")
+                onCompleteListener?.onComplete(
+                    false,
+                    "storage permissions are required, please allow!",
+                    OnCompleteListener.EXIT_CODE_ERROR_STORAGE_PERMISSONS_NOT_GRANTED
+                )
                 return@registerForActivityResult
             }
         }
@@ -682,8 +722,13 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         if (result != null) {
             val inputstream = context.contentResolver.openInputStream(result)!!
             doRestore(inputstream)
+            return@registerForActivityResult
         }
-        onCompleteListener?.onComplete(false, "failure")
+        onCompleteListener?.onComplete(
+            false,
+            "failure",
+            OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CHOOSER
+        )
     }
 
     /**
@@ -693,8 +738,13 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         if (result != null) {
             val out = context.contentResolver.openOutputStream(result)!!
             doBackup(out)
+            return@registerForActivityResult
         }
-        onCompleteListener?.onComplete(false, "failure")
+        onCompleteListener?.onComplete(
+            false,
+            "failure",
+            OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CREATOR
+        )
     }
 
     /**
@@ -742,7 +792,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         //If array is null or empty nothing to do and return
         if (arrayOfFiles.isNullOrEmpty()) {
             if (enableLogDebug) Log.d(TAG, "")
-            onCompleteListener?.onComplete(false, "maxFileCount: Failed to get list of backups")
+            onCompleteListener?.onComplete(
+                false,
+                "maxFileCount: Failed to get list of backups",
+                OnCompleteListener.EXIT_CODE_ERROR
+            )
             return false
         } else if (arrayOfFiles.size > maxFileCount!!) {
             //Sort Array: lastModified

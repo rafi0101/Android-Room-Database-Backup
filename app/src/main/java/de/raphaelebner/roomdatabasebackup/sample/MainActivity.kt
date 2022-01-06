@@ -19,14 +19,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 import de.raphaelebner.roomdatabasebackup.core.RoomBackup
 import de.raphaelebner.roomdatabasebackup.sample.database.main.FruitDatabase
 import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.Fruit
 import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitListAdapter
 import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import java.io.File
 
 
@@ -189,9 +189,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 //maxFileCount: else 1000 because i cannot surround it with if condition
                 .maxFileCount(if (useMaxFileCount) 5 else 1000)
                 .apply {
-                    onCompleteListener { success, message ->
-                        Log.d(TAG, "success: $success, message: $message")
-                        Toast.makeText(this@MainActivity, "success: $success, message: $message", Toast.LENGTH_LONG).show()
+                    onCompleteListener { success, message, exitCode ->
+                        Log.d(TAG, "success: $success, message: $message, exitCode: $exitCode")
+                        Toast.makeText(
+                            this@MainActivity,
+                            "success: $success, message: $message, exitCode: $exitCode",
+                            Toast.LENGTH_LONG
+                        ).show()
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
                 }
@@ -208,9 +212,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .backupIsEncrypted(encryptBackup)
                 .customEncryptPassword(SECRET_PASSWORD)
                 .apply {
-                    onCompleteListener { success, message ->
-                        Log.d(TAG, "success: $success, message: $message")
-                        Toast.makeText(this@MainActivity, "success: $success, message: $message", Toast.LENGTH_LONG).show()
+                    onCompleteListener { success, message, exitCode ->
+                        Log.d(TAG, "success: $success, message: $message, exitCode: $exitCode")
+                        Toast.makeText(
+                            this@MainActivity,
+                            "success: $success, message: $message, exitCode: $exitCode",
+                            Toast.LENGTH_LONG
+                        ).show()
                         if (success) restartApp(Intent(this@MainActivity, MainActivity::class.java))
                     }
 
