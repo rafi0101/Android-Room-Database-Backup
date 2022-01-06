@@ -68,7 +68,7 @@ to [Maven Central](https://search.maven.org/artifact/de.raphaelebner/roomdatabas
 Add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
 
 ```groovy
-implementation 'de.raphaelebner:roomdatabasebackup:1.0.0-beta09'
+implementation 'de.raphaelebner:roomdatabasebackup:1.0.0-beta10'
 ```
 
 Usage
@@ -208,9 +208,8 @@ The following options are optional and the default options
       * success: Boolean (If backup / restore was successful = true)
       * message: String (message with simple hints, if backup / restore failed)
 
-
     ```kotlin
-    .onCompleteListener { success, message ->
+    .onCompleteListener { success, message, exitCode ->
     }
     ```
 
