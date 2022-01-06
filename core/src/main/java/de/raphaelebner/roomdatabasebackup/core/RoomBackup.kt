@@ -22,6 +22,7 @@ import org.apache.commons.io.comparator.LastModifiedFileComparator
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.crypto.BadPaddingException
 
 
 /**
@@ -371,7 +372,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         //Close the database
         roomDatabase!!.close()
         if (backupIsEncrypted) {
-            val encryptedBytes = encryptBackup()
+            val encryptedBytes = encryptBackup() ?: return
             val bos = BufferedOutputStream(FileOutputStream(destination, false))
             bos.write(encryptedBytes)
             bos.flush()
@@ -400,7 +401,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         //Close the database
         roomDatabase!!.close()
         if (backupIsEncrypted) {
-            val encryptedBytes = encryptBackup()
+            val encryptedBytes = encryptBackup() ?: return
             destination.write(encryptedBytes)
         } else {
             //Copy current database to save location (/files dir)
@@ -536,7 +537,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         val fileExtension = source.extension
         if (backupIsEncrypted) {
             copy(source, TEMP_BACKUP_FILE)
-            val decryptedBytes = decryptBackup()
+            val decryptedBytes = decryptBackup() ?: return
             val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
             bos.write(decryptedBytes)
             bos.flush()
@@ -561,8 +562,6 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      * @param source InputStream
      */
     private fun doRestore(source: InputStream) {
-        //Close the database
-        roomDatabase!!.close()
         if (backupIsEncrypted) {
             //Save inputstream to temp file
             source.use { input ->
@@ -571,12 +570,19 @@ class RoomBackup(var context: Context) : FragmentActivity() {
                 }
             }
             //Decrypt tempfile and write to database file
-            val decryptedBytes = decryptBackup()
+            val decryptedBytes = decryptBackup() ?: return
+
+            //Close the database if decryption is succesfull
+            roomDatabase!!.close()
+
             val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
             bos.write(decryptedBytes)
             bos.flush()
             bos.close()
         } else {
+            //Close the database
+            roomDatabase!!.close()
+
             //Copy back database and replace current database
             source.use { input ->
                 DATABASE_FILE.outputStream().use { output ->
@@ -621,18 +627,28 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             val fileData = encryptDecryptBackup.readFile(TEMP_BACKUP_FILE)
 
             val aesEncryptionManager = AESEncryptionManager()
-            val decryptedBytes = aesEncryptionManager.decryptData(sharedPreferences, encryptPassword, fileData)
+            val decryptedBytes =
+                aesEncryptionManager.decryptData(sharedPreferences, encryptPassword, fileData)
 
             //Delete tem file
             TEMP_BACKUP_FILE.delete()
 
             return decryptedBytes
 
+        } catch (e: BadPaddingException) {
+            if (enableLogDebug) Log.d(TAG, "error during decryption (wrong password): ${e.message}")
+            onCompleteListener?.onComplete(
+                false,
+                "error during decryption (wrong password) see Log for more details (if enabled)"
+            )
+            return null
         } catch (e: Exception) {
             if (enableLogDebug) Log.d(TAG, "error during decryption: ${e.message}")
-            onCompleteListener?.onComplete(false, "error during decryption (maybe wrong password) see Log for more details (if enabled)")
+            onCompleteListener?.onComplete(
+                false,
+                "error during decryption see Log for more details (if enabled)"
+            )
             return null
-            //   throw Exception("error during decryption: $e")
         }
     }
 
