@@ -35,7 +35,7 @@ import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewM
 /**
  * MIT License
  * <p>
- * Copyright (c) 2021 Raphael Ebner
+ * Copyright (c) 2022 Raphael Ebner
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

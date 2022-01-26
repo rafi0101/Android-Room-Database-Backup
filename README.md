@@ -76,8 +76,8 @@ Usage
 
 * [Properties](#Properties)
 * [Exit Codes](#Exit-Codes)
-* [Example Activity (Kotlin and Java)](#Example-Activity-(Kotlin-and-Java))
-* [Example Fragment (Java and Kotlin)](#Example-Fragment-(Kotlin-and-Java))
+* [Example Activity (Kotlin and Java)](#example-activity-kotlin-and-java)
+* [Example Fragment (Java and Kotlin)](#example-fragment-kotlin-and-java)
 
 ### Properties
 
@@ -362,7 +362,7 @@ License
 
     MIT License
 
-    Copyright (c) 2021 Raphael Ebner
+    Copyright (c) 2022 Raphael Ebner
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
