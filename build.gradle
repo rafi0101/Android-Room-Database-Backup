@@ -17,6 +17,7 @@ buildscript {
 plugins {
     id('io.github.gradle-nexus.publish-plugin') version "1.1.0"
     id("org.jetbrains.dokka") version "1.6.10"
+    id 'org.jetbrains.kotlin.android' version '1.6.10' apply false
 }
 
 apply from: "${rootDir}/scripts/publish-root.gradle"

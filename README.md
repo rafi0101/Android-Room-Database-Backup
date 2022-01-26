@@ -76,8 +76,8 @@ Usage
 
 * [Properties](#Properties)
 * [Exit Codes](#Exit-Codes)
-* [Example Kotlin](#Example-Kotlin)
-* [Example Java](#Example-Java)
+* [Example Activity (Kotlin and Java)](#Example-Activity-(Kotlin-and-Java))
+* [Example Fragment (Java and Kotlin)](#Example-Fragment-(Kotlin-and-Java))
 
 ### Properties
 
@@ -248,7 +248,9 @@ They can be calles using ```OnCompleteListener.$NAME$```
 | 12        | ```EXIT_CODE_ERROR_STORAGE_PERMISSONS_NOT_GRANTED``` | Storage permissions not granted for custom dialog |
 | 13        | ```EXIT_CODE_ERROR_WRONG_DECRYPTION_PASSWORD```      | Cannot decrypt provided backup file because the password is incorrect |
 
-### Example Kotlin
+### Example Activity (Kotlin and Java)
+
+#### Kotlin
 
 * ##### Backup
 
@@ -291,7 +293,7 @@ They can be calles using ```OnCompleteListener.$NAME$```
             .restore()
     ```
 
-### Example Java
+#### Java
 
 * ##### Backup
 
@@ -326,10 +328,24 @@ They can be calles using ```OnCompleteListener.$NAME$```
     roomBackup.restore();
     ```
 
+### Example Fragment (Kotlin and Java)
+
+##### Kotlin
+
+[`FragmentActivity.kt`](app/src/main/java/de/raphaelebner/roomdatabasebackup/sample/FragmentActivity.kt)  
+[`MainFragment.kt`](app/src/main/java/de/raphaelebner/roomdatabasebackup/sample/MainFragment.kt)
+
+##### Java
+
+[`FragmentActivityJava.java`](app/src/main/java/de/raphaelebner/roomdatabasebackup/sample/FragmentActivityJava.java)  
+[`MainFragmentJava.java`](app/src/main/java/de/raphaelebner/roomdatabasebackup/sample/MainFragmentJava.java)
+
+
 Sample app
 ----------
+
 1. Download this repo
-2. Unzip 
+2. Unzip
 3. Android Studio --> File --> Open --> select this Project
 4. within the app folder you find the sample app
 

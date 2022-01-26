@@ -7,15 +7,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -55,7 +56,11 @@ import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewM
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public class MainActivityJava extends AppCompatActivity implements FruitListAdapter.OnItemClickListener {
+public class MainFragmentJava extends Fragment implements FruitListAdapter.OnItemClickListener {
+
+    public MainFragmentJava() {
+        // Required empty public constructor
+    }
 
     private static final String TAG = "debug_MainActivityJava";
     private FruitViewModel fruitViewModel;
@@ -90,59 +95,61 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
     @SuppressLint("SetTextI18n")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View root = inflater.inflate(R.layout.activity_main, container, false);
+
 
         /*---------------------Link items to Layout--------------------------*/
-        RecyclerView recyclerView = findViewById(R.id.rv_fruits);
-        FloatingActionButton fab = findViewById(R.id.btn_addFruit);
-        Button btn_backup = findViewById(R.id.btn_backup);
-        Button btn_restore = findViewById(R.id.btn_restore);
-        Button btn_language = findViewById(R.id.btn_switch_language);
-        Button btn_fragment_activity = findViewById(R.id.btn_switch_fragment_activity);
-        Button btn_properties = findViewById(R.id.btn_properties);
-        Button btn_backupLocation = findViewById(R.id.btn_backup_location);
-        TextView tvFruits = findViewById(R.id.tv_fruits);
+        RecyclerView recyclerView = root.findViewById(R.id.rv_fruits);
+        FloatingActionButton fab = root.findViewById(R.id.btn_addFruit);
+        Button btn_backup = root.findViewById(R.id.btn_backup);
+        Button btn_restore = root.findViewById(R.id.btn_restore);
+        Button btn_language = root.findViewById(R.id.btn_switch_language);
+        Button btn_fragment_activity = root.findViewById(R.id.btn_switch_fragment_activity);
+        Button btn_properties = root.findViewById(R.id.btn_properties);
+        Button btn_backupLocation = root.findViewById(R.id.btn_backup_location);
+        TextView tvFruits = root.findViewById(R.id.tv_fruits);
 
 
         final FruitListAdapter adapter = new FruitListAdapter(this);
 
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext()));
 
         fruitViewModel = new ViewModelProvider(this).get(FruitViewModel.class);
 
-        fruitViewModel.getAllFruit().observe(this, adapter::submitList);
+        fruitViewModel.getAllFruit().observe(getViewLifecycleOwner(), adapter::submitList);
 
-        tvFruits.setText("Fruits List (Java Activity)");
+        tvFruits.setText("Fruits List (Java Fragment)");
         btn_language.setText("switch to Kotlin");
-        btn_fragment_activity.setText("switch to Fragment");
+        btn_fragment_activity.setText("switch to Activity");
 
         String SHARED_PREFS = "sampleBackup";
         final String spEncryptBackup = "encryptBackup";
         final String spStorageLocation = "storageLocation";
         final String spEnableLog = "enableLog";
         final String spUseMaxFileCount = "useMaxFileCount";
-        final SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = root.getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
 
         /*---------------------FAB Add Button--------------------------*/
         fab.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), ActivityAddEditFruit.class);
+            Intent intent = new Intent(root.getContext(), ActivityAddEditFruit.class);
             openAddEditActivity.launch(intent);
         });
 
-        /*---------------------go to Kotlin MainActivity--------------------------*/
+        /*---------------------go to Kotlin Fragment--------------------------*/
         btn_language.setOnClickListener(v -> {
-            finish();
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            requireActivity().finish();
+            Intent intent = new Intent(root.getContext(), FragmentActivity.class);
             startActivity(intent);
         });
 
-        /*---------------------go to Fragment class--------------------------*/
+        /*---------------------go to Activity class--------------------------*/
         btn_fragment_activity.setOnClickListener(v -> {
-            finish();
-            Intent intent = new Intent(getApplicationContext(), FragmentActivityJava.class);
+            requireActivity().finish();
+            Intent intent = new Intent(root.getContext(), MainActivityJava.class);
             startActivity(intent);
         });
 
@@ -158,7 +165,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         /*---------------------set Properties--------------------------*/
         btn_properties.setOnClickListener(v -> {
-            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivityJava.this);
+            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(root.getContext());
             materialAlertDialogBuilder.setTitle("Change Properties");
             materialAlertDialogBuilder.setPositiveButton("Ok", null);
 
@@ -185,12 +192,12 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         /*---------------------set Backup Location--------------------------*/
         btn_backupLocation.setOnClickListener(v -> {
-            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivityJava.this);
+            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(root.getContext());
             materialAlertDialogBuilder.setTitle("Change Storage");
             materialAlertDialogBuilder.setPositiveButton("Ok", null);
 
-            materialAlertDialogBuilder.setSingleChoiceItems(storageItems, storageLocation-1, (dialog, which) -> {
-                switch(which) {
+            materialAlertDialogBuilder.setSingleChoiceItems(storageItems, storageLocation - 1, (dialog, which) -> {
+                switch (which) {
                     case 0:
                         storageLocation = RoomBackup.BACKUP_FILE_LOCATION_INTERNAL;
                         sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply();
@@ -213,12 +220,14 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         });
 
-        final RoomBackup roomBackup = new RoomBackup(MainActivityJava.this);
+        FragmentActivityJava fragmentActivity = (FragmentActivityJava) getActivity();
+        assert fragmentActivity != null;
+        RoomBackup roomBackup = fragmentActivity.roomBackup;
         /*---------------------Backup and Restore Database--------------------------*/
         btn_backup.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
-            roomBackup.backupLocationCustomFile(new File(this.getFilesDir()+"/databasebackup/geilesBackup.sqlite3"));
-            roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
+            roomBackup.backupLocationCustomFile(new File(root.getContext().getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
+            roomBackup.database(FruitDatabase.Companion.getInstance(root.getContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
@@ -226,7 +235,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             roomBackup.onCompleteListener((success, message, exitCode) -> {
                 Log.d(TAG, "oncomplete: " + success + ", message: " + message + ", exitCode: " + exitCode);
                 if (success)
-                    roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
+                    roomBackup.restartApp(new Intent(root.getContext(), FragmentActivityJava.class));
             });
             roomBackup.backup();
 
@@ -234,47 +243,27 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         btn_restore.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
-            roomBackup.backupLocationCustomFile(new File(this.getFilesDir()+"/databasebackup/geilesBackup.sqlite3"));
-            roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
+            roomBackup.backupLocationCustomFile(new File(root.getContext().getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
+            roomBackup.database(FruitDatabase.Companion.getInstance(root.getContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
             roomBackup.onCompleteListener((success, message, exitCode) -> {
                 Log.d(TAG, "oncomplete: " + success + ", message: " + message + ", exitCode: " + exitCode);
                 if (success)
-                    roomBackup.restartApp(new Intent(getApplicationContext(), MainActivityJava.class));
+                    roomBackup.restartApp(new Intent(root.getContext(), FragmentActivityJava.class));
             });
             roomBackup.restore();
 
         });
 
-
-        /*---------------------Swiping on a row--------------------------*/
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getBindingAdapterPosition();
-                Fruit fruit = adapter.getFruitAt(position);
-
-                assert fruit != null;
-                fruitViewModel.delete(fruit);
-            }
-        }) {
-
-
-        };
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        return root;
     }
 
     /*---------------------onItemClicked listener--------------------------*/
     @Override
     public void onItemClicked(@NotNull Fruit fruit) {
-        Intent intent = new Intent(this, ActivityAddEditFruit.class);
+        Intent intent = new Intent(requireContext(), ActivityAddEditFruit.class);
         intent.putExtra(ActivityAddEditFruit.EXTRA_ID, fruit.getId());
         intent.putExtra(ActivityAddEditFruit.EXTRA_NAME, fruit.getName());
         openAddEditActivity.launch(intent);

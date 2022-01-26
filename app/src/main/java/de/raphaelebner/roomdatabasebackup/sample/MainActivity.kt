@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         val btnRestore: Button = findViewById(R.id.btn_restore)
         val btnProperties: Button = findViewById(R.id.btn_properties)
         val btnLanguage: Button = findViewById(R.id.btn_switch_language)
+        val btnFragmentActivity: Button = findViewById(R.id.btn_switch_fragment_activity)
         val btnBackupLocation: Button = findViewById(R.id.btn_backup_location)
         val tvFruits: TextView = findViewById(R.id.tv_fruits)
 
@@ -85,12 +86,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
 
         fruitViewModel = ViewModelProvider(this)[FruitViewModel::class.java]
 
-        fruitViewModel.allFruit.observe(this, { fruits ->
+        fruitViewModel.allFruit.observe(this) { fruits ->
             adapter.submitList(fruits)
-        })
+        }
 
-        tvFruits.text = "Fruits List (Kotlin)"
+        tvFruits.text = "Fruits List (Kotlin Activity)"
         btnLanguage.text = "switch to Java"
+        btnFragmentActivity.text = "switch to Fragment"
 
         val sharedPrefs = "sampleBackup"
         val spEncryptBackup = "encryptBackup"
@@ -109,6 +111,13 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
         btnLanguage.setOnClickListener {
             finish()
             val intent = Intent(this, MainActivityJava::class.java)
+            startActivity(intent)
+        }
+
+        /*---------------------go to Fragment class--------------------------*/
+        btnFragmentActivity.setOnClickListener {
+            finish()
+            val intent = Intent(this, FragmentActivity::class.java)
             startActivity(intent)
         }
 

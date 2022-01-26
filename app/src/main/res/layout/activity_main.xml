@@ -6,12 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="16dp"
+    tools:ignore="HardcodedText"
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <LinearLayout
             android:id="@+id/ll_properties"
@@ -23,13 +23,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-
-            <Button
-                android:id="@+id/btn_switch_language"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Switch to Kotlin"
-                android:textAllCaps="false" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_switch_language"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:text="Switch to Kotlin"
+                    android:textAllCaps="false"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/btn_switch_fragment_activity"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="Switch to Fragment"
+                    android:textAllCaps="false"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -96,7 +119,6 @@
 
             </LinearLayout>
 
-
         </LinearLayout>
 
 
@@ -104,10 +126,10 @@
             android:id="@+id/tv_fruits"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fruits List (Kotlin)"
+            android:text="Fruits List (Kotlin Activity)"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-            app:layout_constraintEnd_toStartOf="@+id/ll_properties"
-            app:layout_constraintStart_toEndOf="@+id/ll_properties"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ll_properties" />
 
 
@@ -133,6 +155,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="32dp"
-        android:src="@drawable/ic_add" />
+        android:src="@drawable/ic_add"
+        android:contentDescription="Add new Fruit" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
