@@ -1,14 +1,22 @@
 # Android-Room-Database-Backup Changelog
 
+## [v1.0.0-beta11] - 2022-10-30
+
+### Fixes
+
+- Just dependency upgrades
+
 ## [v1.0.0-beta10] - 2022-01-06
 
 ### Breaking Changes
 
-- onCompleteListener provides now an [exitCode](https://github.com/rafi0101/Android-Room-Database-Backup#exit-codes)
+- onCompleteListener provides now
+  an [exitCode](https://github.com/rafi0101/Android-Room-Database-Backup#exit-codes)
 
 ### Fixes
 
-- Crash when database restoring with wrong password: ([#13](https://github.com/rafi0101/Android-Room-Database-Backup/issues/13))
+- Crash when database restoring with wrong
+  password: ([#13](https://github.com/rafi0101/Android-Room-Database-Backup/issues/13))
 
 ### Upgrading Notes
 
@@ -31,11 +39,15 @@
 ## [v1.0.0-beta08] - 2021-11-14
 
 ### Features
+
 - **Custom Backup Location:** ([#9](https://github.com/rafi0101/Android-Room-Database-Backup/issues/9))
 
   You can choose between internal, external application storage and (new) custom storage. If you choose custom storage a CreateDocument() (for creating a backup file) or OpenDocument() (for choosing a backup file to restore) Activity will be opened
 
 ### Upgrading Notes
-- ```.context(this)``` changed to ```val backup = RoomBackup(this)``` and must be declared outside of an onClickListener
 
-- ```.useExternalStorage(false)``` is replaced with ```.backupLocation(backupLocation: Int)```. See [README.md](readme.md)
+- `.context(this)` changed to `val backup = RoomBackup(this)` and must be declared outside of an
+  onClickListener
+
+- `.useExternalStorage(false)` is replaced with `.backupLocation(backupLocation: Int)`.
+  See [README.md](readme.md)
