@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                 .show()
         }
 
-        val backup = RoomBackup(this)
+        val backup = RoomBackup(this@MainActivity)
         /*---------------------Backup and Restore Database--------------------------*/
         btnBackup.setOnClickListener {
             backup

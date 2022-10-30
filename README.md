@@ -7,6 +7,7 @@
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 ![Language](https://img.shields.io/badge/language-Kotlin-orange.svg)
 [![PRWelcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/rafi0101/Android-Room-Database-Backup/pulls)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/rafi0101/Android-Room-Database-Backu/blob/master/LICENSE)
 
 <div align="center">
   <sub>Built with ❤︎ by

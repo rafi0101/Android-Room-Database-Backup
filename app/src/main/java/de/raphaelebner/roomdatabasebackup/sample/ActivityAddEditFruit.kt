@@ -83,7 +83,7 @@ class ActivityAddEditFruit : AppCompatActivity() {
                 deleteFruit = true
                 saveFruit()
             } else {
-                super.onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
         }
 
@@ -128,7 +128,7 @@ class ActivityAddEditFruit : AppCompatActivity() {
             }
             //Back Button
             android.R.id.home -> {
-                super.onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
                 true
 
             }

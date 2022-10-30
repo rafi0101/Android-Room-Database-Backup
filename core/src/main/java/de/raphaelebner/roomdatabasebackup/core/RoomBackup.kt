@@ -11,6 +11,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.fragment.app.FragmentActivity
 import androidx.room.RoomDatabase
 import androidx.security.crypto.EncryptedSharedPreferences
@@ -330,11 +331,10 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      */
     private fun restartApp() {
         restartIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(restartIntent)
         if (context is Activity) {
             (context as Activity).finish()
         }
-        Runtime.getRuntime().exit(0)
+        context.startActivity(restartIntent)
     }
 
     /**
@@ -734,16 +734,14 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     /**
      * Opens the [ActivityResultContracts.CreateDocument] and prompts the user to select a path for creating the new backup file
      */
-    private val openBackupfileCreator = (context as ComponentActivity).registerForActivityResult(ActivityResultContracts.CreateDocument()) { result ->
+    private val openBackupfileCreator = (context as ComponentActivity).registerForActivityResult(CreateDocument("todo/todo")) { result ->
         if (result != null) {
             val out = context.contentResolver.openOutputStream(result)!!
             doBackup(out)
             return@registerForActivityResult
         }
         onCompleteListener?.onComplete(
-            false,
-            "failure",
-            OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CREATOR
+            false, "failure", OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CREATOR
         )
     }
 
