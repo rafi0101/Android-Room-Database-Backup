@@ -331,10 +331,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
      */
     private fun restartApp() {
         restartIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(restartIntent)
         if (context is Activity) {
             (context as Activity).finish()
         }
-        context.startActivity(restartIntent)
+        Runtime.getRuntime().exit(0)
     }
 
     /**
@@ -386,6 +387,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     private fun doBackup(destination: File) {
         //Close the database
         roomDatabase!!.close()
+        roomDatabase = null
         if (backupIsEncrypted) {
             val encryptedBytes = encryptBackup() ?: return
             val bos = BufferedOutputStream(FileOutputStream(destination, false))
@@ -415,6 +417,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     private fun doBackup(destination: OutputStream) {
         //Close the database
         roomDatabase!!.close()
+        roomDatabase = null
         if (backupIsEncrypted) {
             val encryptedBytes = encryptBackup() ?: return
             destination.write(encryptedBytes)
@@ -561,6 +564,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     private fun doRestore(source: File) {
         //Close the database
         roomDatabase!!.close()
+        roomDatabase = null
         val fileExtension = source.extension
         if (backupIsEncrypted) {
             copy(source, TEMP_BACKUP_FILE)
@@ -608,6 +612,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
 
             //Close the database if decryption is succesfull
             roomDatabase!!.close()
+            roomDatabase = null
 
             val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
             bos.write(decryptedBytes)
@@ -616,6 +621,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         } else {
             //Close the database
             roomDatabase!!.close()
+            roomDatabase = null
 
             //Copy back database and replace current database
             source.use { input ->
