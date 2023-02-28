@@ -1,7 +1,6 @@
 package de.raphaelebner.roomdatabasebackup.core
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.Manifest.permission.*
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -369,7 +368,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
             }
             BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
                 backupFilename = filename
-                permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionRequestLauncher.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_AUDIO, READ_MEDIA_VIDEO))
+                } else {
+                    permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+                }
                 return
             }
             BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
@@ -497,7 +500,11 @@ class RoomBackup(var context: Context) : FragmentActivity() {
                 backupDirectory = File("$EXTERNAL_BACKUP_PATH/")
             }
             BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
-                permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionRequestLauncher.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_AUDIO, READ_MEDIA_VIDEO))
+                } else {
+                    permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+                }
                 return
             }
             BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
