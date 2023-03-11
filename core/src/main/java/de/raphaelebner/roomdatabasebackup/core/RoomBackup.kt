@@ -371,7 +371,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionRequestLauncher.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_AUDIO, READ_MEDIA_VIDEO))
                 } else {
-                    permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+                    permissionRequestLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
                 }
                 return
             }
@@ -503,7 +503,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionRequestLauncher.launch(arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_AUDIO, READ_MEDIA_VIDEO))
                 } else {
-                    permissionRequestLauncher.launch(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE))
+                    permissionRequestLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
                 }
                 return
             }
