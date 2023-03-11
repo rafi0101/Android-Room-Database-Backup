@@ -1,5 +1,20 @@
 # Android-Room-Database-Backup Changelog
 
+## [v1.0.0-beta12] - 2023-03-11
+
+### Changes
+
+- Dependency upgrades
+- License changed to 2023
+
+### Fixes
+
+- Improved requested file permissions for SDK33 or later
+  devices ([#25](https://github.com/rafi0101/Android-Room-Database-Backup/pull/25))
+- Only database files are allowed to
+  restore ([#26](https://github.com/rafi0101/Android-Room-Database-Backup/issues/26))
+- Improved builtin restart app function
+
 ## [v1.0.0-beta11] - 2022-10-30
 
 ### Fixes
