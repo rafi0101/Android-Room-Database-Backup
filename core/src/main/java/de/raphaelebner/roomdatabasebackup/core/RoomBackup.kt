@@ -716,7 +716,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
 
             }
             PROCESS_RESTORE -> {
-                openBackupfileChooser.launch(arrayOf("*/*"))
+                openBackupfileChooser.launch(arrayOf("application/octet-stream"))
             }
         }
     }
@@ -740,7 +740,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     /**
      * Opens the [ActivityResultContracts.CreateDocument] and prompts the user to select a path for creating the new backup file
      */
-    private val openBackupfileCreator = (context as ComponentActivity).registerForActivityResult(CreateDocument("todo/todo")) { result ->
+    private val openBackupfileCreator = (context as ComponentActivity).registerForActivityResult(CreateDocument("application/octet-stream")) { result ->
         if (result != null) {
             val out = context.contentResolver.openOutputStream(result)!!
             doBackup(out)
