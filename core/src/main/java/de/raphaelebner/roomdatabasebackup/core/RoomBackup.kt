@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
-import androidx.fragment.app.FragmentActivity
 import androidx.room.RoomDatabase
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
@@ -48,7 +47,7 @@ import javax.crypto.BadPaddingException
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
  */
-class RoomBackup(var context: Context) : FragmentActivity() {
+class RoomBackup(var context: Context) {
 
     companion object {
         private const val SHARED_PREFS = "de.raphaelebner.roomdatabasebackup"
