@@ -1,5 +1,17 @@
 # Android-Room-Database-Backup Changelog
 
+## [v1.0.0-beta13] - 2023-08-15
+
+### Changes
+
+- Dependency/Gradle upgrades
+- Updated Java to v17
+
+### Fixes
+
+- Fixes jetpack compose
+  compatibility ([#29](https://github.com/rafi0101/Android-Room-Database-Backup/pull/29))
+
 ## [v1.0.0-beta12] - 2023-03-11
 
 ### Changes
