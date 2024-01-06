@@ -2,7 +2,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'org.jetbrains.dokka'
 
-task androidSourcesJar(type: Jar) {
+tasks.register('androidSourcesJar', Jar) {
     archiveClassifier.set('sources')
     if (project.plugins.findPlugin("com.android.library")) {
         // For Android libraries
@@ -21,12 +21,14 @@ tasks.withType(dokkaHtmlPartial.getClass()).configureEach {
     )
 }
 
-task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+tasks.register('javadocJar', Jar) {
+    dependsOn dokkaJavadoc
     archiveClassifier.set("javadoc")
     from dokkaJavadoc.outputDirectory
 }
 
-task htmldocJar(type: Jar, dependsOn: dokkaHtml) {
+tasks.register('htmldocJar', Jar) {
+    dependsOn dokkaHtml
     archiveClassifier.set("htmldoc")
     from dokkaHtml.outputDirectory
 }
