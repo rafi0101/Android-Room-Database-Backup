@@ -1,5 +1,17 @@
 # Android-Room-Database-Backup Changelog
 
+## [v1.0.0-beta14] - 2024-01-06
+
+###
+- Migrated from Gradle to Kotlin DSL
+
+**If this version makes any technical problems please feel free to contact me. I made some changes in Gradle/Kotlin DSL and not sure if everything is working as excepted**  
+
+### Fixes
+
+- Just dependency upgrades
+
+
 ## [v1.0.0-beta13] - 2023-08-15
 
 ### Changes

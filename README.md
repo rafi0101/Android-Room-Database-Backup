@@ -3,7 +3,7 @@
 
 ![Build](https://github.com/rafi0101/Android-Room-Database-Backup/workflows/Android%20CI/badge.svg)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.raphaelebner/roomdatabasebackup/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.raphaelebner/roomdatabasebackup)
-[![Room Version](https://img.shields.io/badge/room_version-2.5.2-orange)](https://developer.android.com/jetpack/androidx/releases/room#2.5.2)
+[![Room Version](https://img.shields.io/badge/room_version-2.6.1-orange)](https://developer.android.com/jetpack/androidx/releases/room#2.6.1)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 ![Language](https://img.shields.io/badge/language-Kotlin-orange.svg)
 [![PRWelcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/rafi0101/Android-Room-Database-Backup/pulls)
@@ -43,13 +43,15 @@ Getting started
 -----------
 
 Android-Room-Database-Backup library is pushed
-to [Maven Central](https://central.sonatype.com/artifact/de.raphaelebner/roomdatabasebackup/1.0.0-beta13/versions)
+to [Maven Central](https://central.sonatype.com/artifact/de.raphaelebner/roomdatabasebackup/1.0.0-beta14/versions)
 .  
 Add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
 
 ```groovy
-implementation 'de.raphaelebner:roomdatabasebackup:1.0.0-beta13'
+implementation 'de.raphaelebner:roomdatabasebackup:1.0.0-beta14'
 ```
+
+**If this version makes any technical problems please feel free to contact me. I made some changes in Gradle/Kotlin DSL and not sure if everything is working as excepted**  
 
 Usage
 -----------
