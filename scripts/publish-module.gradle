@@ -1,13 +1,19 @@
+
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'org.jetbrains.dokka'
 
+tasks.withType(Jar).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 tasks.register('androidSourcesJar', Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveClassifier.set('sources')
     if (project.plugins.findPlugin("com.android.library")) {
         // For Android libraries
-        from android.sourceSets.main.java.srcDirs
         from android.sourceSets.main.kotlin.srcDirs
+        from android.sourceSets.main.java.srcDirs
     } else {
         // For pure Kotlin libraries, in case you have them
         from sourceSets.main.java.srcDirs
@@ -39,18 +45,18 @@ artifacts {
     archives htmldocJar
 }
 
-group = PUBLISH_GROUP_ID
-version = PUBLISH_VERSION
+group = GROUP_ID
+version = VERSION_NAME
 
 afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                // The coordinates of the library, being set from variables that
-                // we'll set up later
-                groupId PUBLISH_GROUP_ID
-                artifactId PUBLISH_ARTIFACT_ID
-                version PUBLISH_VERSION
+                tasks.named("generateMetadataFileForReleasePublication").configure {dependsOn(androidSourcesJar)}
+
+                groupId GROUP_ID
+                artifactId ARTIFACT_ID
+                version VERSION_NAME
 
                 // Two artifacts, the `aar` (or `jar`) and the sources
                 if (project.plugins.findPlugin("com.android.library")) {
@@ -61,32 +67,32 @@ afterEvaluate {
 
                 artifact javadocJar
                 artifact htmldocJar
-                artifact androidSourcesJar
+//                artifact androidSourcesJar
 
                 // Mostly self-explanatory metadata
                 pom {
-                    name = PUBLISH_ARTIFACT_ID
-                    description = 'Simple tool to Backup and Restore your Room Database'
-                    url = 'https://github.com/rafi0101/Android-Room-Database-Backup'
+                    name = ARTIFACT_ID
+                    description = POM_DESCRIPTION
+                    url = POM_URL
                     licenses {
                         license {
-                            name = 'MIT License'
-                            url = 'https://github.com/rafi0101/Android-Room-Database-Backup/blob/master/LICENSE'
+                            name = POM_LICENCE_NAME
+                            url = POM_LICENCE_URL
                         }
                     }
                     developers {
                         developer {
-                            id = 'rafi0101'
-                            name = 'Raphael Ebner'
+                            id = POM_DEVELOPER_ID
+                            name = POM_DEVELOPER_NAME
                         }
                     }
 
                     // Version control info - if you're using GitHub, follow the
                     // format as seen here
                     scm {
-                        connection = 'scm:git:github.com/rafi0101/Android-Room-Database-Backup.git'
-                        developerConnection = 'scm:git:ssh://github.com/rafi0101/Android-Room-Database-Backup.git'
-                        url = 'https://github.com/rafi0101/Android-Room-Database-Backup/tree/master'
+                        connection = POM_SCM_CONNECTION
+                        developerConnection = POM_SCM_DEV_CONNECTION
+                        url = POM_SCM_URL
                     }
                 }
             }
