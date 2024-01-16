@@ -13,34 +13,32 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 /**
- *  MIT License
+ * MIT License
  *
- *  Copyright (c) 2023 Raphael Ebner
+ * Copyright (c) 2024 Raphael Ebner
  *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- *  The above copyright notice and this permission notice shall be included in all
- *  copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
  *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 class ActivityAddEditFruit : AppCompatActivity() {
 
     companion object {
         const val EXTRA_ID = "de.raphaelebner.roomdatabasebackup.sample.EXTRA_ID"
         const val EXTRA_NAME = "de.raphaelebner.roomdatabasebackup.sample.EXTRA_NAME"
-        const val EXTRA_DELETE_FRUIT = "de.raphaelebner.roomdatabasebackup.sample.EXTRA_DELETE_FRUIT"
+        const val EXTRA_DELETE_FRUIT =
+                "de.raphaelebner.roomdatabasebackup.sample.EXTRA_DELETE_FRUIT"
     }
 
     private lateinit var tietFruit: TextInputEditText
@@ -72,12 +70,10 @@ class ActivityAddEditFruit : AppCompatActivity() {
             title = "New Fruit"
         }
 
-        //Remove the error message, if user starts typing
-        tietFruit.addTextChangedListener {
-            tilFruit.error = ""
-        }
+        // Remove the error message, if user starts typing
+        tietFruit.addTextChangedListener { tilFruit.error = "" }
 
-        //Delete Fruit
+        // Delete Fruit
         btnDelete.setOnClickListener {
             if (intent.hasExtra(EXTRA_ID)) {
                 deleteFruit = true
@@ -86,15 +82,15 @@ class ActivityAddEditFruit : AppCompatActivity() {
                 onBackPressedDispatcher.onBackPressed()
             }
         }
-
     }
-
 
     /*---------------------Save current entries, and go back--------------------------*/
     private fun saveFruit() {
 
         /*---------------------If EditText is empty--------------------------*/
-        if (TextUtils.isEmpty(tietFruit.text.toString()) || TextUtils.getTrimmedLength(tietFruit.text.toString()) == 0) {
+        if (TextUtils.isEmpty(tietFruit.text.toString()) ||
+                        TextUtils.getTrimmedLength(tietFruit.text.toString()) == 0
+        ) {
             tilFruit.error = "Fruit name is missing!"
             return
         }
@@ -110,7 +106,6 @@ class ActivityAddEditFruit : AppCompatActivity() {
         }
         setResult(Activity.RESULT_OK, data)
         finish()
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -121,20 +116,17 @@ class ActivityAddEditFruit : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            //Save Button
+            // Save Button
             R.id.nav_save -> {
                 saveFruit()
                 true
             }
-            //Back Button
+            // Back Button
             android.R.id.home -> {
                 onBackPressedDispatcher.onBackPressed()
                 true
-
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-
 }

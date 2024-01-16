@@ -36,7 +36,7 @@ import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewM
 /**
  * MIT License
  * <p>
- * Copyright (c) 2023 Raphael Ebner
+ * Copyright (c) 2024 Raphael Ebner
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,8 @@ import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewM
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  * <p>
- * The above copyright notice and this permission notice shall be included in all
+ * The above copyright notice and this permission notice shall be included in
+ * all
  * copies or substantial portions of the Software.
  * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -83,12 +84,13 @@ public class MainFragmentJava extends Fragment implements FruitListAdapter.OnIte
                         fruitViewModel.insert(fruit);
                     } else {
                         fruit.setId(id);
-                        if (deleteFruit) fruitViewModel.delete(fruit);
-                        else fruitViewModel.update(fruit);
+                        if (deleteFruit)
+                            fruitViewModel.delete(fruit);
+                        else
+                            fruitViewModel.update(fruit);
                     }
                 }
-            }
-    );
+            });
     private boolean enableLog;
     private boolean useMaxFileCount;
     private int storageLocation;
@@ -96,10 +98,9 @@ public class MainFragmentJava extends Fragment implements FruitListAdapter.OnIte
     @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.activity_main, container, false);
-
 
         /*---------------------Link items to Layout--------------------------*/
         RecyclerView recyclerView = root.findViewById(R.id.rv_fruits);
@@ -111,7 +112,6 @@ public class MainFragmentJava extends Fragment implements FruitListAdapter.OnIte
         Button btn_properties = root.findViewById(R.id.btn_properties);
         Button btn_backupLocation = root.findViewById(R.id.btn_backup_location);
         TextView tvFruits = root.findViewById(R.id.tv_fruits);
-
 
         final FruitListAdapter adapter = new FruitListAdapter(this);
 
@@ -131,7 +131,8 @@ public class MainFragmentJava extends Fragment implements FruitListAdapter.OnIte
         final String spStorageLocation = "storageLocation";
         final String spEnableLog = "enableLog";
         final String spUseMaxFileCount = "useMaxFileCount";
-        final SharedPreferences sharedPreferences = root.getContext().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = root.getContext().getSharedPreferences(SHARED_PREFS,
+                Context.MODE_PRIVATE);
 
         /*---------------------FAB Add Button--------------------------*/
         fab.setOnClickListener(v -> {
@@ -153,15 +154,14 @@ public class MainFragmentJava extends Fragment implements FruitListAdapter.OnIte
             startActivity(intent);
         });
 
-
         encryptBackup = sharedPreferences.getBoolean(spEncryptBackup, true);
         storageLocation = sharedPreferences.getInt(spStorageLocation, 1);
         enableLog = sharedPreferences.getBoolean(spEnableLog, true);
         useMaxFileCount = sharedPreferences.getBoolean(spUseMaxFileCount, false);
 
-        final String[] multiItems = new String[]{"Encrypt Backup", "enable Log", "use maxFileCount = 5"};
-        final boolean[] checkedItems = new boolean[]{encryptBackup, enableLog, useMaxFileCount};
-        final String[] storageItems = new String[]{"Internal", "External", "Custom Dialog", "Custom File"};
+        final String[] multiItems = new String[] { "Encrypt Backup", "enable Log", "use maxFileCount = 5" };
+        final boolean[] checkedItems = new boolean[] { encryptBackup, enableLog, useMaxFileCount };
+        final String[] storageItems = new String[] { "Internal", "External", "Custom Dialog", "Custom File" };
 
         /*---------------------set Properties--------------------------*/
         btn_properties.setOnClickListener(v -> {
@@ -226,12 +226,14 @@ public class MainFragmentJava extends Fragment implements FruitListAdapter.OnIte
         /*---------------------Backup and Restore Database--------------------------*/
         btn_backup.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
-            roomBackup.backupLocationCustomFile(new File(root.getContext().getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
+            roomBackup.backupLocationCustomFile(
+                    new File(root.getContext().getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
             roomBackup.database(FruitDatabase.Companion.getInstance(root.getContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
-            if (useMaxFileCount) roomBackup.maxFileCount(5);
+            if (useMaxFileCount)
+                roomBackup.maxFileCount(5);
             roomBackup.onCompleteListener((success, message, exitCode) -> {
                 Log.d(TAG, "oncomplete: " + success + ", message: " + message + ", exitCode: " + exitCode);
                 if (success)
@@ -243,7 +245,8 @@ public class MainFragmentJava extends Fragment implements FruitListAdapter.OnIte
 
         btn_restore.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
-            roomBackup.backupLocationCustomFile(new File(root.getContext().getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
+            roomBackup.backupLocationCustomFile(
+                    new File(root.getContext().getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
             roomBackup.database(FruitDatabase.Companion.getInstance(root.getContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);

@@ -3,27 +3,24 @@ package de.raphaelebner.roomdatabasebackup.core
 import de.raphaelebner.roomdatabasebackup.core.RoomBackup.Companion.BACKUP_FILE_LOCATION_CUSTOM_FILE
 
 /**
- *  MIT License
+ * MIT License
  *
- *  Copyright (c) 2023 Raphael Ebner
+ * Copyright (c) 2024 Raphael Ebner
  *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the "Software"), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- *  The above copyright notice and this permission notice shall be included in all
- *  copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
  *
- *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- *  SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 interface OnCompleteListener {
     fun onComplete(success: Boolean, message: String, exitCode: Int)
@@ -39,7 +36,10 @@ interface OnCompleteListener {
         /** Error while choosing backup file to create. Maybe no file selected */
         const val EXIT_CODE_ERROR_BACKUP_FILE_CREATOR = 3
 
-        /** [BACKUP_FILE_LOCATION_CUSTOM_FILE] is set but [RoomBackup.backupLocationCustomFile] is not set */
+        /**
+         * [BACKUP_FILE_LOCATION_CUSTOM_FILE] is set but [RoomBackup.backupLocationCustomFile] is
+         * not set
+         */
         const val EXIT_CODE_ERROR_BACKUP_LOCATION_FILE_MISSING = 4
 
         /** [RoomBackup.backupLocation] is not set */
@@ -54,13 +54,16 @@ interface OnCompleteListener {
         /** Cannot encrypt database backup */
         const val EXIT_CODE_ERROR_ENCRYPTION_ERROR = 8
 
-        /** You tried to restore a encrypted backup but [RoomBackup.backupIsEncrypted] is set to false */
+        /**
+         * You tried to restore a encrypted backup but [RoomBackup.backupIsEncrypted] is set to
+         * false
+         */
         const val EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED = 9
 
         /** No backups to restore are available in internal/external sotrage */
         const val EXIT_CODE_ERROR_RESTORE_NO_BACKUPS_AVAILABLE = 10
 
-        /** No room database to backup is provided  */
+        /** No room database to backup is provided */
         const val EXIT_CODE_ERROR_ROOM_DATABASE_MISSING = 11
 
         /** Storage permissions not granted for custom dialog */
@@ -72,5 +75,4 @@ interface OnCompleteListener {
         /** No error, action successful */
         const val EXIT_CODE_SUCCESS = 0
     }
-
 }

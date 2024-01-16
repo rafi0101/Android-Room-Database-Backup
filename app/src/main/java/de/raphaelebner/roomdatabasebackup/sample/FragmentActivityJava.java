@@ -10,7 +10,7 @@ import de.raphaelebner.roomdatabasebackup.core.RoomBackup;
 /**
  * MIT License
  * <p>
- * Copyright (c) 2023 Raphael Ebner
+ * Copyright (c) 2024 Raphael Ebner
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,7 +19,8 @@ import de.raphaelebner.roomdatabasebackup.core.RoomBackup;
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  * <p>
- * The above copyright notice and this permission notice shall be included in all
+ * The above copyright notice and this permission notice shall be included in
+ * all
  * copies or substantial portions of the Software.
  * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR

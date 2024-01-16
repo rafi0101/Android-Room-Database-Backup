@@ -35,7 +35,7 @@ import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewM
 /**
  * MIT License
  * <p>
- * Copyright (c) 2023 Raphael Ebner
+ * Copyright (c) 2024 Raphael Ebner
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,8 @@ import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewM
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  * <p>
- * The above copyright notice and this permission notice shall be included in all
+ * The above copyright notice and this permission notice shall be included in
+ * all
  * copies or substantial portions of the Software.
  * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -78,12 +79,13 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
                         fruitViewModel.insert(fruit);
                     } else {
                         fruit.setId(id);
-                        if (deleteFruit) fruitViewModel.delete(fruit);
-                        else fruitViewModel.update(fruit);
+                        if (deleteFruit)
+                            fruitViewModel.delete(fruit);
+                        else
+                            fruitViewModel.update(fruit);
                     }
                 }
-            }
-    );
+            });
     private boolean enableLog;
     private boolean useMaxFileCount;
     private int storageLocation;
@@ -104,7 +106,6 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         Button btn_properties = findViewById(R.id.btn_properties);
         Button btn_backupLocation = findViewById(R.id.btn_backup_location);
         TextView tvFruits = findViewById(R.id.tv_fruits);
-
 
         final FruitListAdapter adapter = new FruitListAdapter(this);
 
@@ -146,19 +147,19 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
             startActivity(intent);
         });
 
-
         encryptBackup = sharedPreferences.getBoolean(spEncryptBackup, true);
         storageLocation = sharedPreferences.getInt(spStorageLocation, 1);
         enableLog = sharedPreferences.getBoolean(spEnableLog, true);
         useMaxFileCount = sharedPreferences.getBoolean(spUseMaxFileCount, false);
 
-        final String[] multiItems = new String[]{"Encrypt Backup", "enable Log", "use maxFileCount = 5"};
-        final boolean[] checkedItems = new boolean[]{encryptBackup, enableLog, useMaxFileCount};
-        final String[] storageItems = new String[]{"Internal", "External", "Custom Dialog", "Custom File"};
+        final String[] multiItems = new String[] { "Encrypt Backup", "enable Log", "use maxFileCount = 5" };
+        final boolean[] checkedItems = new boolean[] { encryptBackup, enableLog, useMaxFileCount };
+        final String[] storageItems = new String[] { "Internal", "External", "Custom Dialog", "Custom File" };
 
         /*---------------------set Properties--------------------------*/
         btn_properties.setOnClickListener(v -> {
-            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivityJava.this);
+            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(
+                    MainActivityJava.this);
             materialAlertDialogBuilder.setTitle("Change Properties");
             materialAlertDialogBuilder.setPositiveButton("Ok", null);
 
@@ -185,12 +186,13 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         /*---------------------set Backup Location--------------------------*/
         btn_backupLocation.setOnClickListener(v -> {
-            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(MainActivityJava.this);
+            MaterialAlertDialogBuilder materialAlertDialogBuilder = new MaterialAlertDialogBuilder(
+                    MainActivityJava.this);
             materialAlertDialogBuilder.setTitle("Change Storage");
             materialAlertDialogBuilder.setPositiveButton("Ok", null);
 
-            materialAlertDialogBuilder.setSingleChoiceItems(storageItems, storageLocation-1, (dialog, which) -> {
-                switch(which) {
+            materialAlertDialogBuilder.setSingleChoiceItems(storageItems, storageLocation - 1, (dialog, which) -> {
+                switch (which) {
                     case 0:
                         storageLocation = RoomBackup.BACKUP_FILE_LOCATION_INTERNAL;
                         sharedPreferences.edit().putInt(spStorageLocation, storageLocation).apply();
@@ -217,12 +219,13 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
         /*---------------------Backup and Restore Database--------------------------*/
         btn_backup.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
-            roomBackup.backupLocationCustomFile(new File(this.getFilesDir()+"/databasebackup/geilesBackup.sqlite3"));
+            roomBackup.backupLocationCustomFile(new File(this.getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
             roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);
             roomBackup.customEncryptPassword(MainActivity.SECRET_PASSWORD);
-            if (useMaxFileCount) roomBackup.maxFileCount(5);
+            if (useMaxFileCount)
+                roomBackup.maxFileCount(5);
             roomBackup.onCompleteListener((success, message, exitCode) -> {
                 Log.d(TAG, "oncomplete: " + success + ", message: " + message + ", exitCode: " + exitCode);
                 if (success)
@@ -234,7 +237,7 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         btn_restore.setOnClickListener(v -> {
             roomBackup.backupLocation(storageLocation);
-            roomBackup.backupLocationCustomFile(new File(this.getFilesDir()+"/databasebackup/geilesBackup.sqlite3"));
+            roomBackup.backupLocationCustomFile(new File(this.getFilesDir() + "/databasebackup/geilesBackup.sqlite3"));
             roomBackup.database(FruitDatabase.Companion.getInstance(getApplicationContext()));
             roomBackup.enableLogDebug(enableLog);
             roomBackup.backupIsEncrypted(encryptBackup);
@@ -248,24 +251,24 @@ public class MainActivityJava extends AppCompatActivity implements FruitListAdap
 
         });
 
-
         /*---------------------Swiping on a row--------------------------*/
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView,
+                            @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
 
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getBindingAdapterPosition();
-                Fruit fruit = adapter.getFruitAt(position);
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        int position = viewHolder.getBindingAdapterPosition();
+                        Fruit fruit = adapter.getFruitAt(position);
 
-                assert fruit != null;
-                fruitViewModel.delete(fruit);
-            }
-        }) {
-
+                        assert fruit != null;
+                        fruitViewModel.delete(fruit);
+                    }
+                }) {
 
         };
         itemTouchHelper.attachToRecyclerView(recyclerView);
