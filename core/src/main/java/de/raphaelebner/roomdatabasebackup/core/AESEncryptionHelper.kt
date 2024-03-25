@@ -45,11 +45,8 @@ class AESEncryptionHelper {
      */
     @Throws(Exception::class)
     fun readFile(file: File): ByteArray {
-        val fileContents = file.readBytes()
-        val inputBuffer = BufferedInputStream(FileInputStream(file))
-        inputBuffer.read(fileContents)
-        inputBuffer.close()
-        return fileContents
+        // read file to ByteArray
+        return file.readBytes()
     }
 
     /**
@@ -59,10 +56,12 @@ class AESEncryptionHelper {
      */
     @Throws(Exception::class)
     fun saveFile(fileData: ByteArray, file: File) {
-        val bos = BufferedOutputStream(FileOutputStream(file, false))
-        bos.write(fileData)
-        bos.flush()
-        bos.close()
+        // Even if an exception occurs in the use block, the resource will be closed correctly,
+        // which helps prevent resource leaks and improve application stability and performance.
+        BufferedOutputStream(FileOutputStream(file, false)).use { bos ->
+            bos.write(fileData)
+            bos.flush()
+        }
     }
 
     /**
@@ -84,15 +83,8 @@ class AESEncryptionHelper {
             val charset = ('a'..'z') + ('A'..'Z') + ('1'..'9')
             password = (1..stringLength).map { charset.random() }.joinToString("")
 
-            val secretKey = generateSecretKey(password, iv)
-            // the key can be saved plain, because i am using EncryptedSharedPreferences
-            val editor = sharedPref.edit()
-            editor.putString(BACKUP_SECRET_KEY, password)
-            // I use .commit because when using .apply the needed app restart is faster then apply
-            // and the preferences wont be saved
-            editor.commit()
-
-            return secretKey
+            // save key to shared pref
+            sharedPref.edit().putString(BACKUP_SECRET_KEY, password).commit()
         }
 
         // generate secretKey, and return it

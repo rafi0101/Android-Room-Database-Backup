@@ -22,6 +22,10 @@ class AESEncryptionManager {
 
     private val aesEncryptionHelper = AESEncryptionHelper()
 
+    // Creating a new Cipher instance for each encryption and decryption operation may cause performance degradation because creating a Cipher instance is an expensive operation.
+    // Optimize this problem by creating a Cipher instance at the class level and reusing it when needed.
+    private val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+
     /**
      * This method will encrypt the given data
      * @param sharedPref : the sharedPref, to fetch the key
@@ -50,7 +54,6 @@ class AESEncryptionManager {
         val secretKey = if (encryptPassword != null) { aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
         } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
 
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         val parameterSpec = GCMParameterSpec(128, iv)
 
         //Encryption mode on!
@@ -84,24 +87,21 @@ class AESEncryptionManager {
     )
     fun decryptData(sharedPref: SharedPreferences, encryptPassword: String?, encryptedData: ByteArray): ByteArray {
 
-
-        //Wrap the data into a byte buffer to ease the reading process
-        val byteBuffer = ByteBuffer.wrap(encryptedData)
-        val noonceSize = byteBuffer.int
+        // There is no need to convert to ByteBuffer, which will cause additional performance overhead.
+        val noonceSize = encryptedData[0].toInt()
 
         //Make sure that the file was encrypted properly
         require(!(noonceSize < 12 || noonceSize >= 16)) { "Nonce size is incorrect. Make sure that the incoming data is an AES encrypted file." }
-        val iv = ByteArray(noonceSize)
-        byteBuffer[iv]
+
+        val iv = encryptedData.sliceArray(1 until noonceSize+1)
 
         //Prepare your key/password
         val secretKey = if (encryptPassword != null) { aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
         } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
 
         //get the rest of encrypted data
-        val cipherBytes = ByteArray(byteBuffer.remaining())
-        byteBuffer[cipherBytes]
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val cipherBytes = encryptedData.sliceArray(noonceSize+1 until encryptedData.size)
+
         val parameterSpec = GCMParameterSpec(128, iv)
 
         //Encryption mode on!
