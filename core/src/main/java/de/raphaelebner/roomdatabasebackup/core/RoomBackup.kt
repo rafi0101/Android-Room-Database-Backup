@@ -386,10 +386,10 @@ class RoomBackup(var context: Context) {
         roomDatabase = null
         if (backupIsEncrypted) {
             val encryptedBytes = encryptBackup() ?: return
-            val bos = BufferedOutputStream(FileOutputStream(destination, false))
-            bos.write(encryptedBytes)
-            bos.flush()
-            bos.close()
+            BufferedOutputStream(FileOutputStream(destination, false)).use { bos ->
+                bos.write(encryptedBytes)
+                bos.flush()
+            }
         } else {
             // Copy current database to save location (/files dir)
             copy(DATABASE_FILE, destination)
@@ -577,10 +577,10 @@ class RoomBackup(var context: Context) {
         if (backupIsEncrypted) {
             copy(source, TEMP_BACKUP_FILE)
             val decryptedBytes = decryptBackup() ?: return
-            val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
-            bos.write(decryptedBytes)
-            bos.flush()
-            bos.close()
+            BufferedOutputStream(FileOutputStream(DATABASE_FILE, false)).use { bos ->
+                bos.write(decryptedBytes)
+                bos.flush()
+            }
         } else {
             if (fileExtension == "aes") {
                 if (enableLogDebug)
@@ -622,10 +622,10 @@ class RoomBackup(var context: Context) {
             roomDatabase!!.close()
             roomDatabase = null
 
-            val bos = BufferedOutputStream(FileOutputStream(DATABASE_FILE, false))
-            bos.write(decryptedBytes)
-            bos.flush()
-            bos.close()
+            BufferedOutputStream(FileOutputStream(DATABASE_FILE, false)).use { bos ->
+                bos.write(decryptedBytes)
+                bos.flush()
+            }
         } else {
             // Close the database
             roomDatabase!!.close()
