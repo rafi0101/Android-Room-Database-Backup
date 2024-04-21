@@ -21,7 +21,7 @@ Features
 ---------
 * Create simple backups of your room database
 * Encrypt the backup file with AES encryption
-* Save the backup to any type of storage
+* Save the backup to any type of storage (some types are in beta)
 * Material design
 * Written in Kotlin
 
@@ -51,7 +51,8 @@ Add the dependency for `Android-Room-Database-Backup ` to your app-level `build.
 implementation 'de.raphaelebner:roomdatabasebackup:1.0.0-beta14'
 ```
 
-**If this version makes any technical problems please feel free to contact me. I made some changes in Gradle/Kotlin DSL and not sure if everything is working as excepted**  
+**If the version makes any technical problems please feel free to contact me. I made some changes in
+Gradle/Kotlin DSL and not sure if everything is working as excepted**
 
 Usage
 -----------
@@ -68,6 +69,7 @@ Usage
 * Current context  
   **Attention**  
     Must be declared outside of an onClickListener before lifecycle state changes to started
+
 
     ```kotlin
     RoomBackup(this)
@@ -143,11 +145,11 @@ The following options are optional and the default options
           * Private, storage not accessible
           * This files will be deleted, if you uninstall your app
           * ```RoomBackup.BACKUP_FILE_LOCATION_INTERNAL```
-      * Custom Dialog
+    * Custom Dialog (beta)
           * You can choose to save or restore where ever you want. A CreateDocument() or OpenDocument() Activity will be launched where you can choose the location
           * If your backup is encrypted I reccomend you using a custom encrption password else you can't restore your backup
           * ```RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG```
-      * Custom File
+    * Custom File (beta)
           * You can choose to save or restore to/from a custom File. 
           * If your backup is encrypted I reccomend you using a custom encrption password else you can't restore your backup
           * Please use ```backupLocationCustomFile(File)``` to set a custom File

@@ -23,27 +23,6 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
-
-//    buildFeatures {
-//        buildConfig = true
-//    }
-
-//    buildTypes {
-//        val versionName = properties["VERSION_NAME"]
-//        val versionCode = properties["VERSION_CODE"]
-//        getByName("debug"){
-//            buildConfigField("long", "VERSION_CODE", "$versionCode")
-//            buildConfigField("String","VERSION_NAME","\"$versionName\"")
-//
-//        }
-//        getByName("release") {
-//            isMinifyEnabled = false
-//            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-//            buildConfigField("long", "VERSION_CODE", "$versionCode")
-//            buildConfigField("String","VERSION_NAME","\"$versionName\"")
-//        }
-//    }
-
     buildFeatures {
         viewBinding = true
     }
@@ -61,7 +40,7 @@ apply {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -97,6 +76,6 @@ dependencies {
     //Apache commons io
     //https://mvnrepository.com/artifact/commons-io/commons-io
     //noinspection GradleDependency
-    implementation("commons-io:commons-io:2.15.1")
+    implementation("commons-io:commons-io:2.16.1")
 
 }

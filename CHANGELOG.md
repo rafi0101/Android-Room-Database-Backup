@@ -1,6 +1,6 @@
 # Android-Room-Database-Backup Changelog
 
-## [v1.0.0-beta14] - 2024-01-06
+## [v1.0.0-beta14] - 2024-01-16
 
 ###
 - Migrated from Gradle to Kotlin DSL
@@ -89,4 +89,4 @@
   onClickListener
 
 - `.useExternalStorage(false)` is replaced with `.backupLocation(backupLocation: Int)`.
-  See [README.md](readme.md)
+  See [README.md](README.md)

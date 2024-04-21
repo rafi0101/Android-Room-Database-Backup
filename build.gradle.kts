@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         val kotlinVersion = rootProject.extra.get("kotlin_version")
-        classpath("com.android.tools.build:gradle:8.2.1")
+        classpath("com.android.tools.build:gradle:8.3.2")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0-rc-1"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("org.jetbrains.dokka") version "1.9.10"
     id("org.jetbrains.kotlin.android") version "1.9.10" apply false
     id("com.google.devtools.ksp") version "1.9.10-1.0.13" apply false
@@ -37,5 +37,5 @@ allprojects {
 }
 
 tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory)
 }
