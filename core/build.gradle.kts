@@ -71,7 +71,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     //Google Guava
-    implementation("com.google.guava:guava:31.0.1-jre")
+    implementation("com.google.guava:guava:33.1.0-jre")
 
     //Apache commons io
     //https://mvnrepository.com/artifact/commons-io/commons-io

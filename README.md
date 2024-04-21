@@ -41,12 +41,12 @@ Simple tool to backup and restore your room database in Android
 ## Getting started
 
 Android-Room-Database-Backup library is pushed
-to [Maven Central](https://central.sonatype.com/artifact/de.raphaelebner/roomdatabasebackup/1.0.0-beta14/versions)
+to [Maven Central](https://central.sonatype.com/artifact/de.raphaelebner/roomdatabasebackup/1.0.1/versions)
 .  
 Add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
 
 ```groovy
-implementation 'de.raphaelebner:roomdatabasebackup:1.0.0-beta14'
+implementation 'de.raphaelebner:roomdatabasebackup:1.0.1'
 ```
 
 **If the version makes any technical problems please feel free to contact me. I made some changes in
@@ -141,7 +141,9 @@ The following options are optional and the default options
     - `RoomBackup.BACKUP_FILE_LOCATION_INTERNAL`
   - Custom Dialog (beta)
     - You can choose to save or restore where ever you want. A CreateDocument() or OpenDocument() Activity will be launched where you can choose the location
-    - If your backup is encrypted I reccomend you using a custom encrption password else you can't restore your backup \* `RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG`
+    - If your backup is encrypted I reccomend you using a custom encrption password else you can't
+      restore your backup
+    - `RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG`
   - Custom File (beta)
 
     - You can choose to save or restore to/from a custom File.
