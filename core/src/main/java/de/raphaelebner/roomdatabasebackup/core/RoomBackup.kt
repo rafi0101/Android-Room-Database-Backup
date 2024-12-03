@@ -1,6 +1,5 @@
 package de.raphaelebner.roomdatabasebackup.core
 
-import android.Manifest.permission.*
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -16,12 +15,19 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.io.Files.copy
-import java.io.*
-import java.text.SimpleDateFormat
-import java.util.*
-import javax.crypto.BadPaddingException
 import kotlinx.coroutines.runBlocking
 import org.apache.commons.io.comparator.LastModifiedFileComparator
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Arrays
+import java.util.Calendar
+import java.util.Locale
+import javax.crypto.BadPaddingException
 
 /**
  * MIT License
@@ -302,7 +308,9 @@ class RoomBackup(var context: Context) {
         try {
             INTERNAL_BACKUP_PATH.mkdirs()
             TEMP_BACKUP_PATH.mkdirs()
-        } catch (e: FileAlreadyExistsException) {} catch (e: IOException) {}
+        } catch (_: FileAlreadyExistsException) {
+        } catch (_: IOException) {
+        }
 
         if (enableLogDebug) {
             Log.d(TAG, "DatabaseName: $dbName")
@@ -359,13 +367,7 @@ class RoomBackup(var context: Context) {
             }
             BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
                 backupFilename = filename
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionRequestLauncher.launch(
-                            arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_AUDIO, READ_MEDIA_VIDEO)
-                    )
-                } else {
-                    permissionRequestLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
-                }
+                permissionRequestLauncher.launch(arrayOf())
                 return
             }
             BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
@@ -496,13 +498,7 @@ class RoomBackup(var context: Context) {
                 backupDirectory = File("$EXTERNAL_BACKUP_PATH/")
             }
             BACKUP_FILE_LOCATION_CUSTOM_DIALOG -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionRequestLauncher.launch(
-                            arrayOf(READ_MEDIA_IMAGES, READ_MEDIA_AUDIO, READ_MEDIA_VIDEO)
-                    )
-                } else {
-                    permissionRequestLauncher.launch(arrayOf(READ_EXTERNAL_STORAGE))
-                }
+                permissionRequestLauncher.launch(arrayOf())
                 return
             }
             BACKUP_FILE_LOCATION_CUSTOM_FILE -> {
