@@ -41,12 +41,12 @@ Simple tool to backup and restore your room database in Android
 ## Getting started
 
 Android-Room-Database-Backup library is pushed
-to [Maven Central](https://central.sonatype.com/artifact/de.raphaelebner/roomdatabasebackup/1.0.1/versions)
+to [Maven Central](https://central.sonatype.com/artifact/de.raphaelebner/roomdatabasebackup/1.0.2/versions)
 .  
 Add the dependency for `Android-Room-Database-Backup ` to your app-level `build.gradle` file.
 
 ```groovy
-implementation 'de.raphaelebner:roomdatabasebackup:1.0.1'
+implementation 'de.raphaelebner:roomdatabasebackup:1.0.2'
 ```
 
 **If the version makes any technical problems please feel free to contact me. I made some changes in

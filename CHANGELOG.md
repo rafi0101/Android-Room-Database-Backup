@@ -1,5 +1,13 @@
 # Android-Room-Database-Backup Changelog
 
+## [v1.0.2] - 2024-12-03
+
+### Changes
+
+- Dependency/Gradle upgrades
+- Removed not necessary android manifest
+  permissions ([#40](https://github.com/rafi0101/Android-Room-Database-Backup/issues/40))
+
 ## [v1.0.1] - 2024-04-21
 
 ### Changes
