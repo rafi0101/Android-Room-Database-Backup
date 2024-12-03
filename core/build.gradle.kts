@@ -16,8 +16,8 @@ android {
 
     defaultConfig {
         minSdk = 21
-        compileSdk = 34
-        buildToolsVersion = "34.0.0"
+        compileSdk = 35
+        buildToolsVersion = "35.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -40,11 +40,11 @@ apply {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.core:core-ktx:1.13.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
     //ROOM SQLite
     val roomVersion = "2.6.1"
@@ -65,17 +65,17 @@ dependencies {
     testImplementation("androidx.room:room-testing:$roomVersion")
 
     //Material Design Implementation
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
 
     //Androidx Security
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     //Google Guava
-    implementation("com.google.guava:guava:33.1.0-jre")
+    implementation("com.google.guava:guava:33.3.1-jre")
 
     //Apache commons io
     //https://mvnrepository.com/artifact/commons-io/commons-io
     //noinspection GradleDependency
-    implementation("commons-io:commons-io:2.16.1")
+    implementation("commons-io:commons-io:2.18.0")
 
 }
