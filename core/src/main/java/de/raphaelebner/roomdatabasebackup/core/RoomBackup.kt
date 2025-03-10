@@ -417,13 +417,19 @@ class RoomBackup(var context: Context) {
         // Close the database
         roomDatabase!!.close()
         roomDatabase = null
+
+        val bos = BufferedOutputStream(destination)
         if (backupIsEncrypted) {
             val encryptedBytes = encryptBackup() ?: return
-            destination.write(encryptedBytes)
+            bos.write(encryptedBytes)
         } else {
             // Copy current database to save location (/files dir)
-            copy(DATABASE_FILE, destination)
+            val inputStream = DATABASE_FILE.inputStream().buffered()
+            inputStream.copyTo(bos)
+            inputStream.close()
         }
+        bos.flush()
+        bos.close()
 
         // If maxFileCount is set and is reached, delete oldest file
         if (maxFileCount != null) {
