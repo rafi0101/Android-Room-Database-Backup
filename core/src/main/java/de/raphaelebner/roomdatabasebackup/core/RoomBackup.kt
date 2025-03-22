@@ -727,7 +727,7 @@ class RoomBackup(var context: Context) {
                         openBackupfileCreator.launch(backupFilename)
                     }
                     PROCESS_RESTORE -> {
-                        openBackupfileChooser.launch(arrayOf("application/octet-stream"))
+                        openBackupfileChooser.launch(arrayOf("application/octet-stream", "application/vnd.sqlite3"))
                     }
                 }
             }
