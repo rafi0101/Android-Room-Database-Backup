@@ -49,7 +49,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation(project(":core"))
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     testImplementation("junit:junit:4.13.2")
@@ -78,7 +78,7 @@ dependencies {
     testImplementation("androidx.room:room-testing:$roomVersion")
 
     //Recyclerview Implementation
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
 
     //Material Design Implementation
     implementation("com.google.android.material:material:1.12.0")
