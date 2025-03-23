@@ -1,5 +1,20 @@
 # Android-Room-Database-Backup Changelog
 
+## [v1.1.0] - 2025-03-23
+
+### Changes
+
+- dependency/gradle upgrades
+- customBackupFileName should not contain file extension. File extension(s) will be added automatically
+- changed from maven-publish ossrh to central portal publishing  
+  (I hope this will not break the library (fingers crossed))
+
+### Fixes
+
+- Fix SQLite3 backups not recognized on Android 15 ([#43](https://github.com/rafi0101/Android-Room-Database-Backup/pull/43))
+- Fix UI layout issue on Android 15 (edge-to-edge mode) ([#43](https://github.com/rafi0101/Android-Room-Database-Backup/pull/43))
+- Fix empty Google Drive backups ([#44](https://github.com/rafi0101/Android-Room-Database-Backup/pull/44))
+
 ## [v1.0.2] - 2024-12-03
 
 ### Changes
