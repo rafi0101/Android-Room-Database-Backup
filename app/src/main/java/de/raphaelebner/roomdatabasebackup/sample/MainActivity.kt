@@ -28,6 +28,7 @@ import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.Fruit
 import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitListAdapter
 import de.raphaelebner.roomdatabasebackup.sample.database.table.fruit.FruitViewModel
 import java.io.File
+import androidx.core.content.edit
 
 /**
  * MIT License
@@ -135,20 +136,20 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                             0 -> {
                                 encryptBackup = checked
                                 sharedPreferences
-                                        .edit()
-                                        .putBoolean(spEncryptBackup, encryptBackup)
-                                        .apply()
+                                        .edit {
+                                            putBoolean(spEncryptBackup, encryptBackup)
+                                        }
                             }
                             1 -> {
                                 enableLog = checked
-                                sharedPreferences.edit().putBoolean(spEnableLog, enableLog).apply()
+                                sharedPreferences.edit { putBoolean(spEnableLog, enableLog) }
                             }
                             2 -> {
                                 useMaxFileCount = checked
                                 sharedPreferences
-                                        .edit()
-                                        .putBoolean(spUseMaxFileCount, useMaxFileCount)
-                                        .apply()
+                                        .edit {
+                                            putBoolean(spUseMaxFileCount, useMaxFileCount)
+                                        }
                             }
                         }
                     }
@@ -166,30 +167,30 @@ class MainActivity : AppCompatActivity(), FruitListAdapter.OnItemClickListener {
                             0 -> {
                                 storageLocation = RoomBackup.BACKUP_FILE_LOCATION_INTERNAL
                                 sharedPreferences
-                                        .edit()
-                                        .putInt(spStorageLocation, storageLocation)
-                                        .apply()
+                                        .edit {
+                                            putInt(spStorageLocation, storageLocation)
+                                        }
                             }
                             1 -> {
                                 storageLocation = RoomBackup.BACKUP_FILE_LOCATION_EXTERNAL
                                 sharedPreferences
-                                        .edit()
-                                        .putInt(spStorageLocation, storageLocation)
-                                        .apply()
+                                        .edit {
+                                            putInt(spStorageLocation, storageLocation)
+                                        }
                             }
                             2 -> {
                                 storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG
                                 sharedPreferences
-                                        .edit()
-                                        .putInt(spStorageLocation, storageLocation)
-                                        .apply()
+                                        .edit {
+                                            putInt(spStorageLocation, storageLocation)
+                                        }
                             }
                             3 -> {
                                 storageLocation = RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE
                                 sharedPreferences
-                                        .edit()
-                                        .putInt(spStorageLocation, storageLocation)
-                                        .apply()
+                                        .edit {
+                                            putInt(spStorageLocation, storageLocation)
+                                        }
                             }
                         }
                     }

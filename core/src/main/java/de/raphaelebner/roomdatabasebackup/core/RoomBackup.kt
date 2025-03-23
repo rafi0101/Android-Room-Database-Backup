@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Build
+import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -63,6 +65,8 @@ class RoomBackup(var context: Context) {
         private var currentProcess: Int? = null
         private const val PROCESS_BACKUP = 1
         private const val PROCESS_RESTORE = 2
+        private const val BACKUP_EXTENSION_BASE = "sqlite3"
+        private const val BACKUP_EXTENSION_ENCRYPTED = "aes"
         private var backupFilename: String? = null
 
         /** Code for internal backup location, used for [backupLocation] */
@@ -173,7 +177,7 @@ class RoomBackup(var context: Context) {
 
     /**
      * Set custom Backup File Name, default = "$dbName-$currentTime.sqlite3"
-     *
+     * customBackupFileName should not contain file extension. File extension(s) will be added automatically
      * @param customBackupFileName String
      */
     fun customBackupFileName(customBackupFileName: String): RoomBackup {
@@ -347,13 +351,15 @@ class RoomBackup(var context: Context) {
         // Needed for storage permissions request
         currentProcess = PROCESS_BACKUP
 
-        // Create name for backup file, if no custom name is set: Database name + currentTime +
-        // .sqlite3
+        // Create name for backup file
+        // if no custom name is set: Database name + currentTime + .sqlite3
+        // for custom name: customBackupFileName + .sqlite3
+        // if backup is encrypted: .aes will be added to filename
         var filename =
-                if (customBackupFileName == null) "$dbName-${getTime()}.sqlite3"
-                else customBackupFileName as String
+                if (customBackupFileName == null) "$dbName-${getTime()}.$BACKUP_EXTENSION_BASE"
+                else "$customBackupFileName.$BACKUP_EXTENSION_BASE"
         // Add .aes extension to filename, if file is encrypted
-        if (backupIsEncrypted) filename += ".aes"
+        if (backupIsEncrypted) filename += ".$BACKUP_EXTENSION_ENCRYPTED"
         if (enableLogDebug) Log.d(TAG, "backupFilename: $filename")
 
         when (backupLocation) {
@@ -572,10 +578,11 @@ class RoomBackup(var context: Context) {
      * @param source File
      */
     private fun doRestore(source: File) {
+        val fileExtension = source.extension
+        if (!isChosenFileValidForRestore(fileExtension)) return
         // Close the database
         roomDatabase!!.close()
         roomDatabase = null
-        val fileExtension = source.extension
         if (backupIsEncrypted) {
             copy(source, TEMP_BACKUP_FILE)
             val decryptedBytes = decryptBackup() ?: return
@@ -584,23 +591,9 @@ class RoomBackup(var context: Context) {
             bos.flush()
             bos.close()
         } else {
-            if (fileExtension == "aes") {
-                if (enableLogDebug)
-                        Log.d(
-                                TAG,
-                                "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)"
-                        )
-                onCompleteListener?.onComplete(
-                        false,
-                        "cannot restore database, see Log for more details (if enabled)",
-                        OnCompleteListener.EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED
-                )
-                return
-            }
             // Copy back database and replace current database
             copy(source, DATABASE_FILE)
         }
-
         if (enableLogDebug)
                 Log.d(TAG, "Restore done, decrypted($backupIsEncrypted) and restored from $source")
         onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
@@ -741,6 +734,8 @@ class RoomBackup(var context: Context) {
                     ActivityResultContracts.OpenDocument()
             ) { result ->
                 if (result != null) {
+                    val fileExtension = getFileExtension(result)
+                    if (fileExtension == null || !isChosenFileValidForRestore(fileExtension)) return@registerForActivityResult
                     val inputstream = context.contentResolver.openInputStream(result)!!
                     doRestore(inputstream)
                     return@registerForActivityResult
@@ -840,4 +835,68 @@ class RoomBackup(var context: Context) {
         }
         return true
     }
+
+    /**
+     * Gets the file extension of the [Uri] using ContentResolver.
+     */
+    private fun getFileExtension(uri: Uri): String? {
+        var fileName: String? = null
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val indexOfNameColumn = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (indexOfNameColumn >= 0) fileName = it.getString(indexOfNameColumn)
+            }
+        }
+        return fileName?.substringAfterLast(".")
+    }
+
+    /**
+     * Validating the chosen file with it's [File.extension]
+     * if [backupIsEncrypted] state matches file extension return true, else false
+     */
+    private fun isChosenFileValidForRestore(fileExtension:String): Boolean {
+        return when {
+            backupIsEncrypted && fileExtension == BACKUP_EXTENSION_ENCRYPTED -> true
+            !backupIsEncrypted && fileExtension == BACKUP_EXTENSION_BASE -> true
+            backupIsEncrypted && fileExtension == BACKUP_EXTENSION_BASE -> {
+                if (enableLogDebug) Log.d(TAG,
+                    "isChosenFileValid: chosen file is unencrypted while encrypted file is expected"
+                )
+                onCompleteListener?.onComplete(
+                    false,
+                    "chosen file is unencrypted while encrypted file is expected",
+                    OnCompleteListener.EXIT_CODE_ERROR_DECRYPTION_ERROR
+                )
+                false
+            }
+            !backupIsEncrypted && fileExtension == BACKUP_EXTENSION_ENCRYPTED -> {
+                if (enableLogDebug)
+                    Log.d(
+                        TAG,
+                        "isChosenFileValid: chosen file is encrypted while unencrypted file is expected"
+                    )
+                onCompleteListener?.onComplete(
+                    false,
+                    "chosen file is encrypted while unencrypted file is expected",
+                    OnCompleteListener.EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED
+                )
+                false
+            }
+            else -> {
+                if (enableLogDebug)
+                    Log.d(
+                        TAG,
+                        "isChosenFileValid: chosen file is of wrong extension: $fileExtension"
+                    )
+                onCompleteListener?.onComplete(
+                    false,
+                    "failed to verify the chosen file extension",
+                    OnCompleteListener.EXIT_CODE_ERROR
+                )
+                false
+            }
+        }
+    }
+
 }

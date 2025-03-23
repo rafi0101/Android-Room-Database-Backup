@@ -175,7 +175,9 @@ The following options are optional and the default options
 - Set your custom name to the Backup files
 
   **Attention**\
-  If a backup file with the same name already exists, it will be replaced
+  If a backup file with the same name already exists, it will be replaced  
+  customBackupFileName should not contain file extension. File extension(s) will be added automatically  
+  ".sqlite3" is the default file extension and for encrypted backups ".aes" will be added
 
   ```kotlin
   .customBackupFileName(*DatabaseName* + *currentTime* + ".sqlite3")
