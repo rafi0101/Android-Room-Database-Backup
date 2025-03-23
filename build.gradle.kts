@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     extra.set("kotlin_version", "1.9.10")
@@ -20,12 +22,13 @@ plugins {
     id("org.jetbrains.dokka") version "1.9.10"
     id("org.jetbrains.kotlin.android") version "1.9.10" apply false
     id("com.google.devtools.ksp") version "1.9.10-1.0.13" apply false
+    id("com.vanniktech.maven.publish") version "0.31.0" apply false
 }
 
 
-apply {
-    from("${rootDir}/scripts/publish-root.gradle")
-}
+// apply {
+//     from("${rootDir}/scripts/publish-root.gradle")
+// }
 
 
 

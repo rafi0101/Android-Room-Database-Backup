@@ -1,9 +1,12 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id("com.android.library")
     id("kotlin-android")
     id("com.google.devtools.ksp")
-    id("maven-publish")
     id("org.jetbrains.dokka")
+    id("com.vanniktech.maven.publish") version "0.31.0"
 }
 
 version = properties["VERSION_NAME"] as String
@@ -34,9 +37,29 @@ android {
 
 }
 
-apply {
-    from("${rootDir}/scripts/publish-module.gradle")
+
+mavenPublishing {
+    configure(
+        AndroidSingleVariantLibrary(
+            // the published variant
+            variant = "release",
+            // whether to publish a sources jar
+            sourcesJar = true,
+            // whether to publish a javadoc jar
+            publishJavadocJar = true,
+        )
+    )
+
+
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
 }
+
+
+// apply {
+//     from("${rootDir}/scripts/publish-module.gradle")
+// }
+
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
@@ -71,7 +94,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     //Google Guava
-    implementation("com.google.guava:guava:33.3.1-jre")
+    implementation("com.google.guava:guava:33.4.5-jre")
 
     //Apache commons io
     //https://mvnrepository.com/artifact/commons-io/commons-io
